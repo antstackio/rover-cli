@@ -49,49 +49,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.stackNames = exports.resource_type = void 0;
 var rover_utilities = require("@rover-tools/engine").rover_utilities;
-var cliConfig = require("../rover-cli-poc-main/cliConfig");
-var util = require("../rover-cli-poc-main/util");
+var cliConfig = require("../cli-main/cliConfig");
+var util = require("../cli-main/util");
 var deployment = require("@rover-tools/engine").rover_deployment;
-var buildConfig = require("../rover-cli-poc-main/buildConfig");
+var buildConfig = require("../cli-main/buildConfig");
 var exec = require("child_process").execSync;
-var input = {
-    app_name: "dgb",
-    language: "node",
-    Stacks: { emailAuth: "EmailAuthModule", emailAuths: "BaseModule", basecrud: "CRUD" },
-    CustomStacks: {},
-    StackParams: {
-        emailAuth: { names: "" },
-        emailAuths: {},
-        customone: {},
-        basecrud: { "Book": { "resourcetype": "lambda", "path": "/book", "methods": ["put", "get", "post"] } }
-    },
-    repoconfig: {
-        name: "SAM",
-        repotype: "public",
-        tool: "git",
-        language: "js",
-        framework: "sam",
-        no_envs: 1,
-        accesskey: "",
-        secretkey: "",
-        envs: ["dev"],
-        steps: {
-            dev: ["build", "deploy"]
-        },
-        stackname: {
-            dev: "devemail",
-            test: "testemail"
-        },
-        deploymentbucket: {
-            dev: ""
-        },
-        deploymentregion: {
-            dev: "ap-south-1"
-        },
-        deploymentparameters: { dev: {} },
-        deployment_event: ["push"]
-    }
-};
 var res = [];
 var resources = [];
 var stack_resource_Name = [];
