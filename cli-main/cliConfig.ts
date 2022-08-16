@@ -1,6 +1,6 @@
 
-const customStack= require("rover-engine").rover_components;
-const Stack = require("rover-engine").rover_modules;
+const customStack= require("@rover-tools/engine").rover_components;
+const Stack = require("@rover-tools/engine").rover_modules;
 export let LanguageSupport = {
   node: {
     version: "nodejs14.x",

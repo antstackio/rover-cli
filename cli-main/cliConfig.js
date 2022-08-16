@@ -1,8 +1,8 @@
 "use strict";
 exports.__esModule = true;
 exports.customizable = exports.app = exports.LanguageSupport = void 0;
-var customStack = require("rover-engine").rover_components;
-var Stack = require("rover-engine").rover_modules;
+var customStack = require("@rover-tools/engine").rover_components;
+var Stack = require("@rover-tools/engine").rover_modules;
 exports.LanguageSupport = {
     node: {
         version: "nodejs14.x",

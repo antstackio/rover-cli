@@ -1,8 +1,8 @@
-const rover_utilities=  require("rover-engine").rover_utilities;
+const rover_utilities=  require("@rover-tools/engine").rover_utilities;
 
 import * as cliConfig from "../cli-main/cliConfig";
 import * as util from "../cli-main/util";
-const deployment= require("rover-engine").rover_deployment;
+const deployment= require("@rover-tools/engine").rover_deployment;
 import * as buildConfig from "../cli-main/buildConfig";
 const exec = require("child_process").execSync;
 const input = {

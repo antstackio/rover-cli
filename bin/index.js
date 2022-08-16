@@ -48,10 +48,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.stackNames = exports.resource_type = void 0;
-var rover_utilities = require("rover-engine").rover_utilities;
+var rover_utilities = require("@rover-tools/engine").rover_utilities;
 var cliConfig = require("../rover-cli-poc-main/cliConfig");
 var util = require("../rover-cli-poc-main/util");
-var deployment = require("rover-engine").rover_deployment;
+var deployment = require("@rover-tools/engine").rover_deployment;
 var buildConfig = require("../rover-cli-poc-main/buildConfig");
 var exec = require("child_process").execSync;
 var input = {

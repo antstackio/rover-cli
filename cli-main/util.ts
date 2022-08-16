@@ -4,8 +4,8 @@ import * as inquirer from "inquirer";
 import * as cliConfig from "./cliConfig";
 import * as buildConfig from "./buildConfig";
 
-const moduleParams = require("rover-engine").rover_modules;
-const Stack = require("rover-engine").rover_modules;
+const moduleParams = require("@rover-tools/engine").rover_modules;
+const Stack = require("@rover-tools/engine").rover_modules;
 import * as awsConfig from "./configaws";
 let config = {};
 export let s3Choice:any = [];
