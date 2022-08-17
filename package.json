@@ -1,9 +1,9 @@
 {
   "devDependencies": {
-    "@types/node": "^18.7.6"
+    "@types/node": "^12.12.7"
   },
   "dependencies": {
-    "@rover-tools/engine": "^1.0.0",
+    "@rover-tools/engine": "^0.0.26",
     "@types/inquirer": "^8.2.1",
     "esm": "^3.2.25",
     "immer": "^9.0.14",
@@ -12,15 +12,15 @@
   },
   "name": "@rover-tools/cli",
   "description": "Rover-CLI is a SAM module generating system, which generates SAM projects based on user requirements. It will have a set of predefined stacks(Auth, CRUD) which are commonly used and  a option to define our custom stacks. It is designed using typescript with SAM CLI support. Currently, it is a CLI-based library that supports Node and Python with a limited set of AWS services.",
-  "version": "0.0.19",
-  "main": "bin/init.js",
+  "version": "0.0.53",
+  "main": "bin/init.ts",
   "scripts": {
-    "prepare": "tsc bin/init.ts && tsc bin/index.ts",
-    "start": "tsc bin/init.ts && tsc bin/index.ts && npm install -g .   ",
+    "install": "tsc bin/init.ts && tsc bin/index.ts ",
+    "start": "tsc bin/init.ts && tsc bin/index.ts && npm install -g . ",
     "build": "tsc -p ."
   },
   "bin": {
-    "rover": "bin/init.js"
+    "rover": "bin/init.ts"
   },
   "repository": {
     "type": "git",

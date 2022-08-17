@@ -1,4 +1,4 @@
-import * as aws from "aws-sdk";
+
 import * as init from "../bin/index";
 import * as inquirer from "inquirer";
 import * as cliConfig from "./cliConfig";
