@@ -7,6 +7,7 @@ import * as buildConfig from "./buildConfig";
 const moduleParams = require("@rover-tools/engine").rover_modules;
 const Stack = require("@rover-tools/engine").rover_modules;
 import * as awsConfig from "./configaws";
+import { AnyObject } from "immer/dist/internal";
 let config = {};
 export let s3Choice:any = [];
 export let accesskey:any,secretkey:any;
@@ -150,7 +151,7 @@ export let inputCli = async function (
   choiceOption:any,
   resource = ""
 ) {
-  let res = {};
+  let res:AnyObject = {};
   for (let i = 0; i < subObj.length; i++) {
     if (subObj[i].value === "object") {
       let resp = await inputCli(obj, obj[subObj[i].key], choiceOption);
@@ -176,7 +177,7 @@ export let inputCli = async function (
         res = { ...res, ...r };
       } else {
         let r = await inputCli(obj, obj[p], subObj[i].key);
-        let temp = {};
+        let temp:AnyObject = {};
         temp[`${p}`] = { r };
 
         res[`${subObj[i].key}`] = { ...temp };
@@ -272,7 +273,7 @@ export let inputCli = async function (
 
       if (p) {
         let r = await inputCli(obj, obj[p], subObj[i].key);
-        let temp = {};
+        let temp:AnyObject = {};
         if (p === "GetAtt") {
           let FnGetAtt: any = [];
           FnGetAtt.push(r["Fn::GetAtt"]);
@@ -318,7 +319,7 @@ export let inputCli = async function (
   }
   return res;
 };
-export let password = async function(userName,message:string=""){
+export let password = async function(userName:string,message:string=""){
   let r = await inquirer.prompt([{
     type:'password',
     message:message,
@@ -427,10 +428,10 @@ export let moreStack = async function(message:string){
 }
 
 export let params = async function(module:string){
-  let choice = cliConfig.app.choices;
-  let params = {}
-  let name ={};
-  let res ={};
+  let choice:AnyObject = cliConfig.app.choices;
+  let params:AnyObject = {}
+  let name:AnyObject ={};
+  let res:AnyObject ={};
 if(module==="CRUD"){
   let modulesParams= moduleParams.ModuleParams.CRUD.params;
   let paramslength = modulesParams.length;

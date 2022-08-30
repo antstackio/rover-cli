@@ -4,6 +4,7 @@ import * as cliConfig from "../cli-main/cliConfig";
 import * as util from "../cli-main/util";
 const deployment= require("@rover-tools/engine").rover_deployment;
 import * as buildConfig from "../cli-main/buildConfig";
+import { AnyObject } from "immer/dist/internal";
 const exec = require("child_process").execSync;
 
 let res: any = [];
@@ -12,8 +13,8 @@ let stack_resource_Name: any = [];
 let AppType;
 let template = {};
 let config;
-async function run(argv) {
-  
+async function run(argv:AnyObject) {
+  if(rover_utilities.npmrootTest()){
   if (argv[0] === "init") {
     let editedSam = await util.confirmation();
     if (editedSam === "create new SAM project") {
@@ -21,8 +22,8 @@ async function run(argv) {
       let language = await util.languageChoice();
       let stack_names: any = {};
       let customStacks: any = {};
-      let paramModule;
-      let basecrud = {};
+      let paramModule:AnyObject={};
+      var basecrud:AnyObject={} ;
       let StackParams: any = {};
       let moreStack: any; 
       let i = 1; 
@@ -35,7 +36,7 @@ async function run(argv) {
             `stackName${i}`,
             `Stack ${i} Name: `
           );
-          let stackName = stack_name[`stackName${i}`];
+          let stackName:string = stack_name[`stackName${i}`];
           if (AppType === "CRUD") {
             let tempObj = {};
             do {
@@ -48,7 +49,7 @@ async function run(argv) {
               );
             } while (moreStack !== "No");
 
-            let obj = {};
+            let obj:AnyObject = {};
             obj[stackName] = basecrud;
             StackParams = { ...obj };
           } else {
@@ -88,7 +89,7 @@ async function run(argv) {
       let language = await util.languageChoice();
       let file_name = await exec("ls " + app_name["app_name"] + "/" + "*.yaml ").toString();
       let CompStacks = await rover_utilities.checkNested(file_name);
-      let nestedComponents = {};
+      let nestedComponents:AnyObject = {};
       let choice = Object.keys(CompStacks["CompStacks"]);
       let choiceLength =0
       do {
@@ -96,12 +97,12 @@ async function run(argv) {
         choiceLength = choice.length;
         if (nested) {
           let chooseStack = await util.inputType("Select the module to which you want to add the components ", choice);
-          choice = choice.filter((ele) => ele !== chooseStack);
-
+          let selectedchoice = choice.filter((ele) => Object.values(chooseStack).includes(ele));
+          choice = choice.filter((ele) => ele !== selectedchoice[0]);
           let componentChoice = cliConfig.customizable.choice;
           let components = await util.multichoice("type", componentChoice);
-          let path = CompStacks["CompStacks"][chooseStack];
-          nestedComponents[chooseStack] = { ...components, path: path };
+          let path = CompStacks["CompStacks"][selectedchoice[0]];
+          nestedComponents[selectedchoice[0]] = { ...components, path: path };
 
           template = {
             ...app_name,
@@ -137,44 +138,48 @@ async function run(argv) {
     }
     
     
-  } else if (argv[0] === "deploy") {
-    let r = await util.inputType("choice", "pipeline", "Deploy through:");
-    if (r === "repository and pipeline") {
-      let pipeline = await util.samBuild();
-      let repoConfig = { ...pipeline };
-      template = { ...template, repoConfig };
-      let repoconfig = await Promise.resolve(util.jsonCreation(template));
-      if (repoconfig !== undefined) {
-        await deployment.setupRepo(JSON.parse(repoconfig)["repoConfig"]);
+    } else if (argv[0] === "deploy") {
+      let r = await util.inputType("choice", "pipeline", "Deploy through:");
+      r=r["choice"]
+      if (r === "repository and pipeline") {
+        let pipeline = await util.samBuild();
+        let repoConfig = { ...pipeline };
+        template = { ...template, repoConfig };
+        let repoconfig = await Promise.resolve(util.jsonCreation(template));
+        if (repoconfig !== undefined) {
+          await deployment.setupRepo(JSON.parse(repoconfig)["repoConfig"]);
+        }
+      } else {
+        let file_name = await util.inputString("app_name","File Name :");
+        let stack_name = await util.inputString("stack_name","Stack Name :")
+        let bucketName = await util.inputString("name","Bucket Name :");
+        let choice = buildConfig.samConfig.choices.deploymentregion;
+        let deploymentregion = await util.inputType("deploymentregion",choice);
+        if (bucketName["name"]=="") {
+          bucketName=" --resolve-s3 "
+        }else{
+          bucketName =" --s3-bucket "+ bucketName["name"]
+        }
+        if (stack_name["stack_name"]=="") {stack_name="test"}else{stack_name=stack_name["stack_name"]}
+        let region=deploymentregion["deploymentregion"]
+        console.log(typeof stack_name,stack_name)
+        exec("sh " + rover_utilities.npmroot +"/rover-cli/utlities/exec.sh "+file_name["app_name"]+" "+stack_name+" "+region+" "+bucketName);
       }
     } else {
-      let file_name = await util.inputString("app_name","File Name :");
-      let stack_name = await util.inputString("stack_name","Stack Name :")
-      let bucketName = await util.inputString("name","Bucket Name :");
-      let choice = buildConfig.samConfig.choices.deploymentregion;
-      let deploymentregion = await util.inputType("deploymentregion",choice);
-      if (bucketName["name"]=="") {
-        bucketName=" --resolve-s3 "
-      }else{
-        bucketName =" --s3-bucket "+ bucketName["name"]
-      }
-      if (stack_name["stack_name"]=="") {stack_name="test"}else{stack_name=stack_name["stack_name"]}
-      let region=deploymentregion["deploymentregion"]
-      console.log(typeof stack_name,stack_name)
-      exec("sh " + rover_utilities.npmroot +"/rover-prototype/utlities/exec.sh "+file_name["app_name"]+" "+stack_name+" "+region+" "+bucketName);
+      console.log(
+        "rover " +
+          argv +
+          " - not a rover command \n  rover init   - creates new SAM project \n  rover deploy - deploys SAM project"
+      );
     }
-  } else {
-    console.log(
-      "rover " +
-        argv +
-        " - not a rover command \n  rover init   - creates new SAM project \n  rover deploy - deploys SAM project"
-    );
+  }else{
+    console.log("Note: install @rover-tools/cli globally (install @rover-tools/cli -g)")
   }
 }
 export let resource_type = ({} = res);
 export let stackNames: any = stack_resource_Name;
-let moreStack
-let customStacks
-let i
+let moreStack;
+let customStacks:AnyObject;
+let i:number;
 
 run(process.argv.slice(2));

@@ -1,26 +1,31 @@
 {
   "devDependencies": {
-    "@types/node": "^12.12.7"
+    "@types/node": "^12.12.7",
+    "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@rover-tools/engine": "^0.0.26",
+    "@rover-tools/engine": "^0.0.43",
     "@types/inquirer": "^8.2.1",
     "esm": "^3.2.25",
     "immer": "^9.0.14",
     "inquirer": "^8.2.4",
+    "shx": "^0.3.4",
     "yaml": "^1.10.2"
   },
+  "type": "commonjs",
   "name": "@rover-tools/cli",
   "description": "Rover-CLI is a SAM module generating system, which generates SAM projects based on user requirements. It will have a set of predefined stacks(Auth, CRUD) which are commonly used and  a option to define our custom stacks. It is designed using typescript with SAM CLI support. Currently, it is a CLI-based library that supports Node and Python with a limited set of AWS services.",
-  "version": "0.0.53",
-  "main": "bin/init.ts",
+  "version": "0.0.88",
+  "main": "dist/bin/init.js",
   "scripts": {
-    "install": "tsc bin/init.ts && tsc bin/index.ts ",
-    "start": "tsc bin/init.ts && tsc bin/index.ts && npm install -g . ",
-    "build": "tsc -p ."
+    "clean": "shx rm -rf dist/*",
+    "start": "tsc   bin/init.ts && tsc  bin/index.ts && npm install -g . ",
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepack": "npm run clean && npm run build "
   },
   "bin": {
-    "rover": "bin/init.ts"
+    "rover": "dist/bin/init.js"
   },
   "repository": {
     "type": "git",
@@ -29,10 +34,9 @@
   "author": "DGB",
   "license": "MIT",
   "keywords": [
-    "rover",
+    "@rover-tools",
     "AWS",
-    "AWS-SAM",
-    "SAM"
+    "AWS-SAM"
   ],
   "bugs": {
     "url": "https://github.com/antstackio/rover-cli/issues"
