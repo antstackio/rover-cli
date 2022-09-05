@@ -14,11 +14,13 @@ let AppType;
 let template = {};
 let config;
 async function run(argv:AnyObject) {
+  try{
   if(rover_utilities.npmrootTest()){
   if (argv[0] === "init") {
     let editedSam = await util.confirmation();
     if (editedSam === "create new SAM project") {
       let app_name = await util.inputString("app_name", "App Name:");
+      await rover_utilities.checkFile(app_name["app_name"],"no")
       let language = await util.languageChoice();
       let stack_names: any = {};
       let customStacks: any = {};
@@ -85,6 +87,7 @@ async function run(argv:AnyObject) {
     } else if (editedSam === "add components to existing SAM") {
       
       let app_name = await util.inputString("app_name", "App Name");
+      await rover_utilities.checkFile(app_name["app_name"],"yes")
       //console.log(app_name)
       let language = await util.languageChoice();
       let file_name = await exec("ls " + app_name["app_name"] + "/" + "*.yaml ").toString();
@@ -147,10 +150,12 @@ async function run(argv:AnyObject) {
         template = { ...template, repoConfig };
         let repoconfig = await Promise.resolve(util.jsonCreation(template));
         if (repoconfig !== undefined) {
+          await rover_utilities.checkFile(JSON.parse(repoconfig)["repoConfig"]["app_name"],"yes")
           await deployment.setupRepo(JSON.parse(repoconfig)["repoConfig"]);
         }
       } else {
         let file_name = await util.inputString("app_name","File Name :");
+        await rover_utilities.checkFile(file_name["app_name"],"yes")
         let stack_name = await util.inputString("stack_name","Stack Name :")
         let bucketName = await util.inputString("name","Bucket Name :");
         let choice = buildConfig.samConfig.choices.deploymentregion;
@@ -162,8 +167,8 @@ async function run(argv:AnyObject) {
         }
         if (stack_name["stack_name"]=="") {stack_name="test"}else{stack_name=stack_name["stack_name"]}
         let region=deploymentregion["deploymentregion"]
-        console.log(typeof stack_name,stack_name)
-        exec("sh " + rover_utilities.npmroot +"/rover-cli/utlities/exec.sh "+file_name["app_name"]+" "+stack_name+" "+region+" "+bucketName);
+        // console.log(typeof stack_name,stack_name)
+        exec("sh " + rover_utilities.npmroot +"/@rover-tools/cli/cli-main/exec.sh "+file_name["app_name"]+" "+stack_name+" "+region+" "+bucketName);
       }
     } else {
       console.log(
@@ -175,6 +180,10 @@ async function run(argv:AnyObject) {
   }else{
     console.log("Note: install @rover-tools/cli globally (install @rover-tools/cli -g)")
   }
+}catch (error) {
+  console.log("Error: ",error)
+  
+}
 }
 export let resource_type = ({} = res);
 export let stackNames: any = stack_resource_Name;
