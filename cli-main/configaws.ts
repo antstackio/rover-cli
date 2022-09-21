@@ -9,7 +9,3 @@ export let aws={
 
 
 
-// export let aws={
-//     "AWS_ACCESS_KEY_ID":"AKIA57GLKGCHSR4BPGZS",
-//     "AWS_SECRET_ACCESS_KEY":"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",
-//     }

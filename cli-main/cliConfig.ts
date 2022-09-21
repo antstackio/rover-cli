@@ -16,11 +16,11 @@ export let LanguageSupport = {
 export let app =
 {
   choices:{
-    methods:["put","get","post","delete","options"],
+    methods:["put","get","post","delete"],
     resourcetype:["lambda","stepfunction","dynamodb"],
     language:["Node","Python"],
     type:Object.values(Stack.ModuleDescription),
-    pipeline:["repository and pipeline","cli"]
+    pipeline:["generate pipeline","cli","repository and pipeline"]
   },
  
 }

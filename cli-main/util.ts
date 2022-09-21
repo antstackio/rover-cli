@@ -3,12 +3,22 @@ import * as init from "../bin/index";
 import * as inquirer from "inquirer";
 import * as cliConfig from "./cliConfig";
 import * as buildConfig from "./buildConfig";
-
+var fs = require("fs");
+let Yaml = require("js-yaml");
+const exec = require("child_process").execSync;
+var path = require('path');
 const moduleParams = require("@rover-tools/engine").rover_modules;
 const Stack = require("@rover-tools/engine").rover_modules;
 import * as awsConfig from "./configaws";
-import { AnyObject } from "immer/dist/internal";
+import { AnyArray, AnyObject } from "immer/dist/internal";
+const rover_utilities=  require("@rover-tools/engine").rover_utilities;
+const TOML = require('@iarna/toml')
 let config = {};
+let pythonpattern=new RegExp(/python[1-9]*\.[1-9]*/g)
+let jspattern=new RegExp(/nodejs[1-9]*\.[a-zA-Z]*/g)
+let yamlpattern=new RegExp(/(\.yaml$)/g)
+let apipathpattern=new RegExp(/^\/[a-zA-Z]*(\/[a-zA-Z]*-*)*/g)
+
 export let s3Choice:any = [];
 export let accesskey:any,secretkey:any;
 
@@ -16,7 +26,7 @@ export let multichoice = async function (name:string, choice:any) {
   let r = await inquirer.prompt([
     {
       type: "checkbox",
-      message: "Please select your components :",
+      message:  "Please select your "+ name.charAt(0).toUpperCase() + name.slice(1)+" :",
       name: name,
       choices: choice,
       validate(answer) {
@@ -32,7 +42,6 @@ export let multichoice = async function (name:string, choice:any) {
 };
 
 export let jsonCreation = async function (obj:any) {
-  const fs = require("fs/promises");
 
   try {
     const content = JSON.stringify(obj, null, 2);
@@ -42,13 +51,25 @@ export let jsonCreation = async function (obj:any) {
   }
 };
 
-export let inputString = async function (userName: string, message = "") {
+export let inputString = async function (userName: string, message = "",defaults:string) {
   let takeInput = await inquirer.prompt([
     {
       type: "input",
       name: userName,
       message: message,
+      validate: function (value) {
+        if (userName=="path"){
+        var pass = apipathpattern.test(value)
+        if (pass) {
+          return true
+        }
+        return "Please enter a valid path"
+        }else{
+          return true
+        }
+      
     },
+  },
   ]);
 
  return ({...takeInput})
@@ -107,22 +128,27 @@ export let inputNumber = async function (userName: string,message:string) {
     displayname=message
   }
   let takeInput = await inquirer.prompt([
-    
     {
-      type: "number",
+      type: "input",
       message: `Please enter the required number of ${displayname} you want ?`,
       name: `${userName}`,
       validate: function (value) {
-        if (isNaN(value)) {
-          return "Please  enter valid number";
-        } else {
-          return true;
+        var pass = !isNaN(value)
+        if (pass) {
+          return true
         }
+        return 'Please enter a valid number'
+        // if (isNaN(value)) {
+        //   return "Please enter valid number"
+        //   // return inputNumber(userName,message)
+        // } else {
+        //   return true;
+        // }
       },
     },
-  ]);
-
-  return takeInput[`${userName}`];
+  ])
+ // console.log(takeInput)
+  return parseInt(takeInput[`${userName}`],10);
 };
 
 export let validates = function (
@@ -253,7 +279,7 @@ export let inputCli = async function (
           .map(({ key, value }) => key);
         res[subObj[i].key] = choiceNames[0];
       } else {
-        let name = await inputString("name", `${subObj[i].message}-->Name`);
+        let name = await inputString("name", `${subObj[i].message}-->Name`,"");
         let stack_names = await inputType("stack_resource", "resource",subObj[i].message);
         
         let temp = name;
@@ -328,13 +354,18 @@ export let password = async function(userName:string,message:string=""){
   return r;
 }
 
-export let samBuild = async function () {
+export let samBuild = async function (lang) {
   let obj = buildConfig.samConfig;
+  let dirPath:String=exec("pwd").toString().replace("\n","");
   let subObj = buildConfig.samConfig.samBuild;
-  let sam = await inputCli(obj, subObj, "");
-  let accesskey = await password("accesskey","Accesskey:");
-  let secretkey = await password("secretkey","Secretkey:")
-  let no_of_env = await inputNumber("no_of_env","Environments(dev,test)");
+  let sam:object = await inputCli(obj, subObj, "");
+  let temp:object={}
+  sam =Object.values(sam).map(ele=>{
+Object.assign(temp,ele)
+  })
+  sam=temp
+  sam["language"]=lang
+  let no_of_env = await inputNumber("no_of_env","environments/branch");
   let envs: string[] = [];
   let steps: any = {};
   let stacknames: any = {};
@@ -344,41 +375,45 @@ export let samBuild = async function () {
   let deployementbuckets: any = {};
   let depBucketNames: any = {};
   for (let i = 1; i <= no_of_env; i++) {
-    let env = await inputString(`env${i}`,`Envrionment ${i} :`);
+    let env = await inputString(`env${i}`,`Envrionment ${i} :`,"");
     let envName = env[`env${i}`];
     envs.push(envName);
     let stepsChoice = buildConfig.samConfig.choices.dev;
-    let step = await multichoice(`${envName}`, stepsChoice);
+    let step = await multichoice("steps required for "+`${envName}`+" environment " , stepsChoice);
+    let steps1:object={}
+    step=Object.keys(step).map(ele=>{
+      let name:string=ele.replace("steps required for ","")
+      name=name.replace(" environment ","")
+      steps1[name] =step[ele]
+    })
+
     let stackname = await inputString(
       `${envName}`,
-      `Stack Name --> ${envName} :`
+      `Stack Name(optional) --> ${envName} :`,""
     );
     let deploymentbucket = await inputString(
       `${envName}`,
-      `Deployment Bucket --> ${envName} :`
+      `Deployment Bucket(optional) --> ${envName} :`,""
     );
     let regionChoice = buildConfig.samConfig.choices.deploymentregion;
     let deployment_region = await inputType(`${envName}`, regionChoice,"Deployment Region");
     let deployment_parameter = await inputString(
       `${envName}`,
-      `Deployment Parameter--> ${envName} :`
+      `Deployment Parameter(optional) --> ${envName} :`,""
     );
-   
-   
-
-    steps = { ...steps, ...step };
+    steps = { ...steps,...steps1 };
     stacknames = { ...stacknames, ...stackname };
     depBucketNames = {
       ...depBucketNames,
       ...deploymentbucket,
     };
-    deploymentregion[`${envName}`] = deployment_region;
+    deploymentregion[`${envName}`] = deployment_region[`${envName}`];
     deploymentparameters = { ...deploymentparameters, ...deployment_parameter };
     
   }
   let deployment_choice = buildConfig.samConfig.choices.deployment
-    let deploymentEvent = await multichoice(`deployment_event`,deployment_choice);
-    
+    let deploymentEvent = await multichoice(`deployment events`,deployment_choice);
+  let framework={"framework":"sam"}
   let result: any = {};
   result = {
     ...sam,
@@ -386,6 +421,7 @@ export let samBuild = async function () {
     ...accesskey,
     ...secretkey,
     envs,
+    ...framework,
     steps,
     stackname: { ...stacknames },
     deploymentbucket: {
@@ -396,10 +432,7 @@ export let samBuild = async function () {
     deploymentparameters,
     ...deploymentEvent,
   };
-
   //console.log(JSON.stringify(result, null, 2));
- 
-  
   return result;
 };
 
@@ -450,11 +483,11 @@ if(module==="CRUD"){
        }else{
        
         if(modulesParams[i].key==="name"){
-          let r = await inputString("name",modulesParams[i].message);
+          let r = await inputString("name",modulesParams[i].message,"");
           name = r;
 
         }else{
-          let r =  await inputString(modulesParams[i].key,modulesParams[i].message)
+          let r =  await inputString(modulesParams[i].key,modulesParams[i].message,"")
           res = { ...res, ...r };
         }
        
@@ -476,4 +509,63 @@ if(module==="CRUD"){
 }
   
   
+}
+
+export let langValue=async function () {
+  
+  let pwd =(process.cwd()+"/").trim()
+  if(!fs.existsSync(pwd+".aws-sam/build.toml"))exec("sam build")
+  let data=fs.readFileSync(pwd+".aws-sam/build.toml", { encoding: "utf-8" })
+  data=TOML.parse(data)
+  let langarray:AnyArray=[]
+  let jsresult:AnyArray=[]
+  let pyresult:AnyArray=[]
+  Object.keys(data).map(ele=>{
+    Object.keys(data[ele]).map(obj=>{
+      if(data[ele][obj].hasOwnProperty("runtime"))langarray.push(data[ele][obj]["runtime"])})
+    }
+    )
+  langarray.map(ele=>{
+      if (ele.match(jspattern)!==null)jsresult.push(...ele.match(jspattern))
+      if (ele.match(pythonpattern)!==null)pyresult.push(...ele.match(pythonpattern))
+  
+  })
+  if(jsresult.length>pyresult.length) return "js"
+  else if(pyresult.length>jsresult.length) return "python"
+  else return "js"
+  
+}
+
+export let samValidate=function(){
+  try {
+    let files:AnyArray=fs.readdirSync(exec("pwd").toString().replace("\n",""))
+    let yamlfiles:AnyArray=[]
+    let response:AnyArray=[]
+    files.map(ele=>{if (ele.match(yamlpattern)!==null)yamlfiles.push(ele)})
+    yamlfiles.map(ele=>{
+      let data=fs.readFileSync(ele,{ encoding: "utf-8" })
+      data=Yaml.load(rover_utilities.replaceTempTag(data))
+      if(data.hasOwnProperty("AWSTemplateFormatVersion")
+      &&data.hasOwnProperty("Transform")
+      &&data.hasOwnProperty("Description")
+      &&data.hasOwnProperty("Resources")){response.push(true)
+    }
+    })
+    if (!response.includes(true)) {
+      throw("improper SAM Template file")
+    }
+  } catch (error) {
+    throw("Not a SAM file  :"+error)
+  }
+  
+}
+export let makeid =function (length) {
+  var result           = '';
+  var characters       = 'abcdefghijklmnopqrstuvwxyz';
+  var charactersLength = characters.length;
+  for ( var i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * 
+charactersLength));
+ }
+ return result;
 }

@@ -19,7 +19,7 @@ async function run(argv:AnyObject) {
   if (argv[0] === "init") {
     let editedSam = await util.confirmation();
     if (editedSam === "create new SAM project") {
-      let app_name = await util.inputString("app_name", "App Name:");
+      let app_name:object = await util.inputString("app_name", "App Name:","");
       await rover_utilities.checkFile(app_name["app_name"],"no")
       let language = await util.languageChoice();
       let stack_names: any = {};
@@ -28,35 +28,45 @@ async function run(argv:AnyObject) {
       var basecrud:AnyObject={} ;
       let StackParams: any = {};
       let moreStack: any; 
+      let stackname:object= {};
       let i = 1; 
+      let obj:AnyObject = {};
       do{
         
         let app_Types: any = [];
-        let AppType:any = await util.appType("Type :");
+        let AppType:string = await util.appType("Module Type :");
+       
+       
         if (AppType !== "Customizable") {
-          let stack_name = await util.inputString(
-            `stackName${i}`,
-            `Stack ${i} Name: `
-          );
+          stackname[`stackName${i}`]=util.makeid(2)
+          let stack_name = stackname
+          // let stack_name = await util.inputString(
+          //   `stackName${i}`,
+          //   `Stack ${i} Name: `,
+          //   ""
+          // );
+          //console.log(stack_name)
           let stackName:string = stack_name[`stackName${i}`];
           if (AppType === "CRUD") {
+            let crud:AnyObject={} ;
             let tempObj = {};
             do {
               paramModule = await util.params(AppType);
-              //console.log(paramModule);
-              basecrud[paramModule.name] = paramModule.res;
-              tempObj = { ...tempObj, basecrud };
+              paramModule["res"]["resourcetype"]='lambda'
+              paramModule["res"]["methods"].push("options")
+              crud[paramModule.name] = paramModule.res;
+              
+              obj[stackName] = crud;
+              tempObj = { ...tempObj, crud };
               moreStack = await util.moreStack(
                 "Do you want to add another API ?"
               );
             } while (moreStack !== "No");
 
-            let obj:AnyObject = {};
-            obj[stackName] = basecrud;
+           //console.log("obj",obj)
             StackParams = { ...obj };
           } else {
             paramModule = await util.params(AppType);
-            let obj = {};
             obj[stackName] = basecrud;
             StackParams = { ...obj };
           }
@@ -67,7 +77,8 @@ async function run(argv:AnyObject) {
           let choice = cliConfig.customizable.choice;
           let customstack_name = await util.inputString(
             `customStackName${i}`,
-            `Stack ${i} Name: `
+            `Stack ${i} Name: `,
+            ""
           );
           let CustomStacks = await util.multichoice("app_type", choice);
           customStacks[customstack_name[`customStackName${i}`]] =
@@ -80,13 +91,13 @@ async function run(argv:AnyObject) {
         if (stack_names !== null ) template = { ...template, Stacks: stack_names ,StackParams};
         if (customStacks !== null)
           template = { ...template, CustomStacks: customStacks };
-          //console.log(JSON.stringify(template))
+         // console.log(JSON.stringify(template))
           await rover_utilities.generationSAM(({template})["template"]);
       };
       //await rover_utilities.generationSAM(input);
     } else if (editedSam === "add components to existing SAM") {
       
-      let app_name = await util.inputString("app_name", "App Name");
+      let app_name = await util.inputString("app_name", "App Name","");
       await rover_utilities.checkFile(app_name["app_name"],"yes")
       //console.log(app_name)
       let language = await util.languageChoice();
@@ -133,42 +144,46 @@ async function run(argv:AnyObject) {
         }
         
       } while (moreStack !== "No"|| choiceLength===0)
-
       //console.log(JSON.stringify(template, null, 2));
       await rover_utilities.addComponents(template)
     }else if (editedSam === "add modules to existing SAM") {
       console.log("Work in progress...");
     }
-    
-    
     } else if (argv[0] === "deploy") {
       let r = await util.inputType("choice", "pipeline", "Deploy through:");
       r=r["choice"]
       if (r === "repository and pipeline") {
-        let pipeline = await util.samBuild();
+        console.log("Work in progress...");
+      } else if(r === "generate pipeline"){
+        await util.samValidate()
+        let lang:String=await util.langValue()
+        let pipeline = await util.samBuild(lang);
         let repoConfig = { ...pipeline };
         template = { ...template, repoConfig };
         let repoconfig = await Promise.resolve(util.jsonCreation(template));
         if (repoconfig !== undefined) {
-          await rover_utilities.checkFile(JSON.parse(repoconfig)["repoConfig"]["app_name"],"yes")
+          //await rover_utilities.checkFile(JSON.parse(repoconfig)["repoConfig"]["app_name"],"yes")
           await deployment.setupRepo(JSON.parse(repoconfig)["repoConfig"]);
         }
-      } else {
-        let file_name = await util.inputString("app_name","File Name :");
-        await rover_utilities.checkFile(file_name["app_name"],"yes")
-        let stack_name = await util.inputString("stack_name","Stack Name :")
-        let bucketName = await util.inputString("name","Bucket Name :");
+      }
+      else {
+        await util.samValidate()
+        let filenamearray=(exec("pwd").toString()).split("/")
+        let file_name = filenamearray[filenamearray.length-1].replace("\n","");
+        let stack_name = await util.inputString("stack_name","Stack Name(optional) :","")
+        let bucketName = await util.inputString("name","Bucket Name(optional) :","");
         let choice = buildConfig.samConfig.choices.deploymentregion;
-        let deploymentregion = await util.inputType("deploymentregion",choice);
+        let deploymentregion = await util.inputType("Deployment region",choice);
         if (bucketName["name"]=="") {
           bucketName=" --resolve-s3 "
         }else{
           bucketName =" --s3-bucket "+ bucketName["name"]
         }
-        if (stack_name["stack_name"]=="") {stack_name="test"}else{stack_name=stack_name["stack_name"]}
-        let region=deploymentregion["deploymentregion"]
+        if (stack_name["stack_name"]=="") {stack_name=file_name+"roverTest"}else{stack_name=stack_name["stack_name"]}
+        let region=deploymentregion["Deployment region"]
         // console.log(typeof stack_name,stack_name)
-        exec("sh " + rover_utilities.npmroot +"/@rover-tools/cli/cli-main/exec.sh "+file_name["app_name"]+" "+stack_name+" "+region+" "+bucketName);
+        exec("sh " + rover_utilities.npmroot +"/@rover-tools/cli/cli-main/exec.sh "+file_name+" "+stack_name+" "+region+" "+bucketName);
+        
       }
     } else {
       console.log(
