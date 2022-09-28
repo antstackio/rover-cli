@@ -19,7 +19,7 @@ async function run(argv:AnyObject) {
   if (argv[0] === "init") {
     let editedSam = await util.confirmation();
     if (editedSam === "create new SAM project") {
-      let app_name:object = await util.inputString("app_name", "App Name:","");
+      let app_name:object = await util.inputString("app_name","", "App Name:");
       await rover_utilities.checkFile(app_name["app_name"],"no")
       let language = await util.languageChoice();
       let stack_names: any = {};
@@ -70,8 +70,8 @@ async function run(argv:AnyObject) {
           let choice = cliConfig.customizable.choice;
           let customstack_name = await util.inputString(
             `customStackName${i}`,
-            `Stack ${i} Name: `,
-            ""
+            "",
+            `Stack ${i} Name: `
           );
           let CustomStacks = await util.multichoice("app_type", choice);
           customStacks[customstack_name[`customStackName${i}`]] =
@@ -86,11 +86,11 @@ async function run(argv:AnyObject) {
           template = { ...template, CustomStacks: customStacks };
         
           await rover_utilities.generationSAM(({template})["template"]);
-      };
+      }
       
     } else if (editedSam === "add components to existing SAM") {
       
-      let app_name = await util.inputString("app_name", "App Name","");
+      let app_name = await util.inputString("app_name","", "App Name");
       await rover_utilities.checkFile(app_name["app_name"],"yes")
      
       let language = await util.languageChoice();
@@ -163,8 +163,8 @@ async function run(argv:AnyObject) {
         await util.samValidate()
         let filenamearray=(exec("pwd").toString()).split("/")
         let file_name = filenamearray[filenamearray.length-1].replace("\n","");
-        let stack_name = await util.inputString("stack_name","Stack Name(optional) :","")
-        let bucketName = await util.inputString("name","Bucket Name(optional) :","");
+        let stack_name = await util.inputString("stack_name","","Stack Name(optional) :")
+        let bucketName = await util.inputString("name","","Bucket Name(optional) :");
         let choice = buildConfig.samConfig.choices.deploymentregion;
         let deploymentregion = await util.inputType("Deployment region",choice);
         if (bucketName["name"]=="") {
