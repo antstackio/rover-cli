@@ -200,7 +200,7 @@ async function run(argv:AnyObject) {
   
 }
 }
-export let resource_type = ({} = res);
+//export let resource_type = ({} = res);
 export let stackNames: any = stack_resource_Name;
 let moreStack;
 let customStacks:AnyObject;

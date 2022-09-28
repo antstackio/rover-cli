@@ -161,7 +161,7 @@ export let validates = function (
   if (type === "string") {
     if (typeof value !== "string" && min >= value.length && max <= value.length)
       return "Please enter valid text";
-    else true;
+    else return true;
   } else if (type === "number") {
     if (isNaN(value) && min >= value && max <= value) {
       return "Please  enter valid number";
@@ -560,12 +560,6 @@ export let samValidate=function(){
   
 }
 export let makeid =function (length) {
-  var result           = '';
-  var characters       = 'abcdefghijklmnopqrstuvwxyz';
-  var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * 
-charactersLength));
- }
- return result;
+  const crypto = require('crypto');
+  return (crypto.randomBytes(1).toString("base64url").replace(/[0-9]/g, 'd')).toLowerCase();
 }
