@@ -445,7 +445,6 @@ export let moreStack = async function(message:string){
 
 export let params = async function(module:string){
   let choice:AnyObject = cliConfig.app.choices;
-  let params:AnyObject = {}
   let name:AnyObject ={};
   let res:AnyObject ={};
 if(module==="CRUD"){
@@ -476,13 +475,13 @@ if(module==="CRUD"){
        
     }
   }
-  return params ={
+  return {
     res,
     name: name["name"]
   }
   
   }else{
-    return
+    return {}
   }
 
 
