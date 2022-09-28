@@ -515,12 +515,12 @@ export let langValue=async function () {
   let langarray:AnyArray=[]
   let jsresult:AnyArray=[]
   let pyresult:AnyArray=[]
-  Object.keys(data).map(ele=>{
-    Object.keys(data[ele]).map(obj=>{
+  Object.keys(data).forEach(ele=>{
+    Object.keys(data[ele]).forEach(obj=>{
       if(data[ele][obj].hasOwnProperty("runtime"))langarray.push(data[ele][obj]["runtime"])})
     }
     )
-  langarray.map(ele=>{
+  langarray.forEach(ele=>{
       if (ele.match(jspattern)!==null)jsresult.push(...ele.match(jspattern))
       if (ele.match(pythonpattern)!==null)pyresult.push(...ele.match(pythonpattern))
   
