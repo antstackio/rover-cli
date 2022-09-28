@@ -8,7 +8,6 @@ let Yaml = require("js-yaml");
 const exec = require("child_process").execSync;
 const moduleParams = require("@rover-tools/engine").rover_modules;
 const Stack = require("@rover-tools/engine").rover_modules;
-import * as awsConfig from "./configaws";
 import { AnyArray, AnyObject } from "immer/dist/internal";
 const rover_utilities=  require("@rover-tools/engine").rover_utilities;
 const TOML = require('@iarna/toml')
@@ -49,7 +48,7 @@ export let jsonCreation = async function (obj:any) {
   }
 };
 
-export let inputString = async function (userName: string, message = "",defaults:string) {
+export let inputString = async function (userName: string,defaults:string, message = "") {
   let takeInput = await inquirer.prompt([
     {
       type: "input",
@@ -272,7 +271,7 @@ export let inputCli = async function (
           .map(({ key, value }) => key);
         res[subObj[i].key] = choiceNames[0];
       } else {
-        let name = await inputString("name", `${subObj[i].message}-->Name`,"");
+        let name = await inputString("name","", `${subObj[i].message}-->Name`);
         let stack_names = await inputType("stack_resource", "resource",subObj[i].message);
         
         let temp = name;
@@ -368,7 +367,7 @@ Object.assign(temp,ele)
   let deployementbuckets: any = {};
   let depBucketNames: any = {};
   for (let i = 1; i <= no_of_env; i++) {
-    let env = await inputString(`env${i}`,`Envrionment ${i} :`,"");
+    let env = await inputString(`env${i}`,"",`Envrionment ${i} :`);
     let envName = env[`env${i}`];
     envs.push(envName);
     let stepsChoice = buildConfig.samConfig.choices.dev;
@@ -382,17 +381,20 @@ Object.assign(temp,ele)
 
     let stackname = await inputString(
       `${envName}`,
-      `Stack Name(optional) --> ${envName} :`,""
+      "",
+      `Stack Name(optional) --> ${envName} :`
     );
     let deploymentbucket = await inputString(
       `${envName}`,
-      `Deployment Bucket(optional) --> ${envName} :`,""
+      "",
+      `Deployment Bucket(optional) --> ${envName} :`
     );
     let regionChoice = buildConfig.samConfig.choices.deploymentregion;
     let deployment_region = await inputType(`${envName}`, regionChoice,"Deployment Region");
     let deployment_parameter = await inputString(
       `${envName}`,
-      `Deployment Parameter(optional) --> ${envName} :`,""
+      "",
+      `Deployment Parameter(optional) --> ${envName} :`
     );
     steps = { ...steps,...steps1 };
     stacknames = { ...stacknames, ...stackname };
@@ -476,11 +478,11 @@ if(module==="CRUD"){
        }else{
        
         if(modulesParams[i].key==="name"){
-          let r = await inputString("name",modulesParams[i].message,"");
+          let r = await inputString("name","",modulesParams[i].message);
           name = r;
 
         }else{
-          let r =  await inputString(modulesParams[i].key,modulesParams[i].message,"")
+          let r =  await inputString(modulesParams[i].key,"",modulesParams[i].message)
           res = { ...res, ...r };
         }
        
