@@ -149,7 +149,7 @@ async function run(argv:AnyObject) {
         console.log("Work in progress...");
       } else if(r === "generate pipeline"){
         await util.samValidate()
-        let lang:String=await util.langValue()
+        let lang:string=await util.langValue()
         let pipeline = await util.samBuild(lang);
         let repoConfig = { ...pipeline };
         template = { ...template, repoConfig };

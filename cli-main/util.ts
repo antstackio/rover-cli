@@ -272,15 +272,10 @@ export let inputCli = async function (
         res[subObj[i].key] = choiceNames[0];
       } else {
         let name = await inputString("name","", `${subObj[i].message}-->Name`);
-        let stack_names = await inputType("stack_resource", "resource",subObj[i].message);
         
         let temp = name;
 
-        res[`${subObj[i].key}`] = temp.name;
-
-       
-
-       
+        res[`${subObj[i].key}`] = temp.name;       
       }
     } else if (subObj[i].value === "choiceList") {
       let choice = obj.choices[subObj[i].key];
@@ -328,10 +323,6 @@ export let inputCli = async function (
         },
       ]);
       res = { ...res, ...r };
-     
-       
-
-      
     }
     
   }
@@ -348,11 +339,10 @@ export let password = async function(userName:string,message:string=""){
 
 export let samBuild = async function (lang) {
   let obj = buildConfig.samConfig;
-  let dirPath:String=exec("pwd").toString().replace("\n","");
   let subObj = buildConfig.samConfig.samBuild;
   let sam:object = await inputCli(obj, subObj, "");
   let temp:object={}
-  sam =Object.values(sam).map(ele=>{
+  Object.values(sam).map(ele=>{
 Object.assign(temp,ele)
   })
   sam=temp
@@ -363,8 +353,6 @@ Object.assign(temp,ele)
   let stacknames: any = {};
   let deploymentregion: any = {};
   let deploymentparameters: any = {};
-  let deployment_event: any = {};
-  let deployementbuckets: any = {};
   let depBucketNames: any = {};
   for (let i = 1; i <= no_of_env; i++) {
     let env = await inputString(`env${i}`,"",`Envrionment ${i} :`);
