@@ -161,7 +161,7 @@ export let validates = function (
   if (type === "string") {
     if (typeof value !== "string" && min >= value.length && max <= value.length)
       return "Please enter valid text";
-    else true;
+    else return true;
   } else if (type === "number") {
     if (isNaN(value) && min >= value && max <= value) {
       return "Please  enter valid number";
