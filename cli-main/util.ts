@@ -554,5 +554,5 @@ export let samValidate=function(){
 }
 export let makeid =function (length) {
   const crypto = require('crypto');
-  return (crypto.randomBytes(1).toString("base64url").replace(/[0-9]/g, 'd')).toLowerCase();
+  return (crypto.randomBytes(1).toString("base64url").replace(/\d/g, 'd')).toLowerCase();
 }
