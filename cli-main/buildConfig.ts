@@ -36,12 +36,10 @@ export let samConfig = {
     samBuild: [
     
 
-   // { key: "name", value: "string" ,message:"Name:"},
-  //{ key: "app_name", value: "string",message:"App Name:" },
+
     { key: "repoType", value: "choice",message:"Repo Type:" },
     { key: "tool", value: "choice",message:"Tools:" },
-    //{ key: "language", value: "choice",message:"Language:" },
-    //{ key: "framework", value: "choice",message:"Framework:" },
+
   
     ]
   }

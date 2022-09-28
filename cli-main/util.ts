@@ -3,17 +3,15 @@ import * as init from "../bin/index";
 import * as inquirer from "inquirer";
 import * as cliConfig from "./cliConfig";
 import * as buildConfig from "./buildConfig";
-var fs = require("fs");
+let fs = require("fs");
 let Yaml = require("js-yaml");
 const exec = require("child_process").execSync;
-var path = require('path');
 const moduleParams = require("@rover-tools/engine").rover_modules;
 const Stack = require("@rover-tools/engine").rover_modules;
 import * as awsConfig from "./configaws";
 import { AnyArray, AnyObject } from "immer/dist/internal";
 const rover_utilities=  require("@rover-tools/engine").rover_utilities;
 const TOML = require('@iarna/toml')
-let config = {};
 let pythonpattern=new RegExp(/python[1-9]*\.[1-9]*/g)
 let jspattern=new RegExp(/nodejs[1-9]*\.[a-zA-Z]*/g)
 let yamlpattern=new RegExp(/(\.yaml$)/g)
@@ -59,7 +57,7 @@ export let inputString = async function (userName: string, message = "",defaults
       message: message,
       validate: function (value) {
         if (userName=="path"){
-        var pass = apipathpattern.test(value)
+        let pass = apipathpattern.test(value)
         if (pass) {
           return true
         }
@@ -133,21 +131,16 @@ export let inputNumber = async function (userName: string,message:string) {
       message: `Please enter the required number of ${displayname} you want ?`,
       name: `${userName}`,
       validate: function (value) {
-        var pass = !isNaN(value)
+        let pass = !isNaN(value)
         if (pass) {
           return true
         }
         return 'Please enter a valid number'
-        // if (isNaN(value)) {
-        //   return "Please enter valid number"
-        //   // return inputNumber(userName,message)
-        // } else {
-        //   return true;
-        // }
+       
       },
     },
   ])
- // console.log(takeInput)
+ 
   return parseInt(takeInput[`${userName}`],10);
 };
 
@@ -304,7 +297,7 @@ export let inputCli = async function (
           let FnGetAtt: any = [];
           FnGetAtt.push(r["Fn::GetAtt"]);
           FnGetAtt.push("Arn");
-          temp = { FnGetAtt }; //"Fn::GetAtt": ["PostSignup","Arn"]
+          temp = { FnGetAtt }; 
         } else if (p === "Ref") {
           temp = { ...r };
         } else {
@@ -432,7 +425,7 @@ Object.assign(temp,ele)
     deploymentparameters,
     ...deploymentEvent,
   };
-  //console.log(JSON.stringify(result, null, 2));
+  
   return result;
 };
 
@@ -561,5 +554,5 @@ export let samValidate=function(){
 }
 export let makeid =function (length) {
   const crypto = require('crypto');
-  return (crypto.randomBytes(1).toString("base64url").replace(/[0-9]/g, 'd')).toLowerCase();
+  return (crypto.randomBytes(1).toString("base64url").replace(/\d/g, 'd')).toLowerCase();
 }
