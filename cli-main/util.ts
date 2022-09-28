@@ -170,76 +170,76 @@ export let inputCli = async function (
   resource = ""
 ) {
   let res:AnyObject = {};
-  for (let i = 0; i < subObj.length; i++) {
-    if (subObj[i].value === "object") {
-      let resp = await inputCli(obj, obj[subObj[i].key], choiceOption);
-      res = { ...res, [subObj[i].key]: resp };
-    } else if (subObj[i].value === "choice") {
-      let choice = obj.choices[subObj[i].key];
-      let r = await inputType(subObj[i].key, choice,subObj[i].message);
-      res[`${subObj[i].key}`] = r;
-    } else if (subObj[i].value === "choiceOption") {
-      let choice = obj.choiceOption[subObj[i].key];
-      let p = await inputType(subObj[i].key, choice,subObj[i].message);
+  for (let sobj of subObj) {
+    if (sobj.value === "object") {
+      let resp = await inputCli(obj, obj[sobj.key], choiceOption);
+      res = { ...res, [sobj.key]: resp };
+    } else if (sobj.value === "choice") {
+      let choice = obj.choices[sobj.key];
+      let r = await inputType(sobj.key, choice,sobj.message);
+      res[`${sobj.key}`] = r;
+    } else if (sobj.value === "choiceOption") {
+      let choice = obj.choiceOption[sobj.key];
+      let p = await inputType(sobj.key, choice,sobj.message);
 
       if (p === "String") {
         let r = await inquirer.prompt([
           {
             type: "input",
             message: `${choiceOption === "" ? "" : choiceOption + "->"}${
-              subObj[i].message
+              sobj.message
             }`,
-            name: `${subObj[i].key}`,
+            name: `${sobj.key}`,
           },
         ]);
         res = { ...res, ...r };
       } else {
-        let r = await inputCli(obj, obj[p], subObj[i].key);
+        let r = await inputCli(obj, obj[p], sobj.key);
         let temp:AnyObject = {};
         temp[`${p}`] = { r };
 
-        res[`${subObj[i].key}`] = { ...temp };
+        res[`${sobj.key}`] = { ...temp };
       }
-    } else if (subObj[i].value === "list") {
-      let r = await inputNumber(subObj[i].key,subObj[i].message );
+    } else if (sobj.value === "list") {
+      let r = await inputNumber(sobj.key,sobj.message );
       let codeUriArr: any = [];
       for (let j = 0; j < r; j++) {
         let r = await inquirer.prompt([
           {
             type: "input",
             message: `${choiceOption === "" ? "" : choiceOption + "->"}${
-              subObj[i].message
+              sobj.message
             }`,
-            name: `${subObj[i].key}`,
+            name: `${sobj.key}`,
           },
         ]);
-        codeUriArr.push(r[`${subObj[i].key}`]);
+        codeUriArr.push(r[`${sobj.key}`]);
       }
-      res[`${subObj[i].key}`] = codeUriArr;
-    } else if (subObj[i].value === "Boolean") {
+      res[`${sobj.key}`] = codeUriArr;
+    } else if (sobj.value === "Boolean") {
       let r = await inquirer.prompt([
         {
           type: "confirm",
-          name: `${subObj[i].key}`,
-          message: `DO you want ${subObj[i].message} property  to be enabled`,
+          name: `${sobj.key}`,
+          message: `DO you want ${sobj.message} property  to be enabled`,
         },
       ]);
 
-      res[`${subObj[i].key}`] = r;
-    } else if (subObj[i].value === "objectList") {
-      let p = await inputNumber(subObj[i].key,subObj[i].message);
+      res[`${sobj.key}`] = r;
+    } else if (sobj.value === "objectList") {
+      let p = await inputNumber(sobj.key,sobj.message);
       let objListArr: any = [];
       while (p-- !== 0) {
-        let temp = await inputCli(obj, obj[subObj[i].key], subObj[i].key);
+        let temp = await inputCli(obj, obj[sobj.key], sobj.key);
         objListArr.push(temp);
       }
 
-      res[`${subObj[i].key}`] = objListArr;
-    } else if (subObj[i].value === "multipleChoice") {
-      if (subObj[i].key === "Action") {
+      res[`${sobj.key}`] = objListArr;
+    } else if (sobj.value === "multipleChoice") {
+      if (sobj.key === "Action") {
         let choice = init.stackNames.map(({ key, value }) => value);
         choice = choice.filter((item, pos) => choice.indexOf(item) == pos);
-        let p = await inputType(subObj[i].key, choice,subObj[i].message);
+        let p = await inputType(sobj.key, choice,sobj.message);
         choice = obj.choices[p];
 
         let r = await multichoice(p, choice);
@@ -247,45 +247,45 @@ export let inputCli = async function (
         let actionArr = r[p].map((ele) => `${p}:${ele}`);
         res = { Action: actionArr };
       } else {
-        let choice = obj.choices[subObj[i].key];
-        let r = await multichoice(subObj[i].key, choice,);
+        let choice = obj.choices[sobj.key];
+        let r = await multichoice(sobj.key, choice,);
         res = { ...res, ...r };
       }
-    } else if (subObj[i].value === "choiceReference") {
+    } else if (sobj.value === "choiceReference") {
       let choice = init.stackNames.map(({ key, value }) => value);
       choice = choice.filter((item, pos) => choice.indexOf(item) == pos);
       if (
-        (subObj[i].key === "resource" || subObj[i].key === "Ref") &&
+        (sobj.key === "resource" || sobj.key === "Ref") &&
         choice.length > 0
       ) {
-        let p = await inputType(subObj[i].key, choice);
+        let p = await inputType(sobj.key, choice);
         let choiceNames = init.stackNames
           .filter(({ key, value }) => value === p)
           .map(({ key, value }) => key);
         let r = await inputType(p, choiceNames);
         
-        res[`${subObj[i].key}`] = r;
-      } else if (subObj[i].key === "role" && choice.indexOf("iamrole") !== -1) {
+        res[`${sobj.key}`] = r;
+      } else if (sobj.key === "role" && choice.indexOf("iamrole") !== -1) {
         let choiceNames = init.stackNames
           .filter(({ key, value }) => value === "iamrole")
           .map(({ key, value }) => key);
-        res[subObj[i].key] = choiceNames[0];
+        res[sobj.key] = choiceNames[0];
       } else {
-        let name = await inputString("name","", `${subObj[i].message}-->Name`);
+        let name = await inputString("name","", `${sobj.message}-->Name`);
         
         let temp = name;
 
-        res[`${subObj[i].key}`] = temp.name;       
+        res[`${sobj.key}`] = temp.name;       
       }
-    } else if (subObj[i].value === "choiceList") {
-      let choice = obj.choices[subObj[i].key];
+    } else if (sobj.value === "choiceList") {
+      let choice = obj.choices[sobj.key];
 
-      let p = await inputType(subObj[i].key, choice,subObj[i].message);
+      let p = await inputType(sobj.key, choice,sobj.message);
 
       let s = {};
 
       if (p) {
-        let r = await inputCli(obj, obj[p], subObj[i].key);
+        let r = await inputCli(obj, obj[p], sobj.key);
         let temp:AnyObject = {};
         if (p === "GetAtt") {
           let FnGetAtt: any = [];
@@ -298,28 +298,28 @@ export let inputCli = async function (
           temp[`${p}`] = { ...r };
         }
 
-        res[`${subObj[i].key}`] = { ...temp };
+        res[`${sobj.key}`] = { ...temp };
       }
-    }else if(subObj[i].key==='accesskey' || subObj[i].key==='secretkey'){
+    }else if(sobj.key==='accesskey' || sobj.key==='secretkey'){
       let r = await inquirer.prompt([
         {
           type: 'password',
           message: `${choiceOption === "" ? "" : choiceOption + "->"}${
-            subObj[i].message
+            sobj.message
           }`,
-          name: `${subObj[i].key}`,
+          name: `${sobj.key}`,
         },
       ]);
       res = { ...res, ...r };
-      accesskey = r[subObj[i].key];
+      accesskey = r[sobj.key];
     } else {  
       let r = await inquirer.prompt([
         {
           type: "input",
           message: `${choiceOption === "" ? "" : choiceOption + "->"}${
-            subObj[i].message
+            sobj.message
           }`,
-          name: `${subObj[i].key}`,
+          name: `${sobj.key}`,
         },
       ]);
       res = { ...res, ...r };
@@ -427,10 +427,10 @@ export let appType = async function(message:string=""){
     choices:cliConfig.app.choices.type
   }])
   let stackModule = Stack.ModuleDescription;
-  for(let i=0;i<stackModule.length;i++){
-    if(stackModule[i].value===r["app_Type"]){
-       return stackModule[i].key;
-    ;}
+  for(let smodule of stackModule){
+    if(smodule.value===r["app_Type"]){
+       return smodule.key;
+    }
   }
 }
 export let moreStack = async function(message:string){

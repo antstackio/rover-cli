@@ -83,8 +83,7 @@ async function run(argv:AnyObject) {
         template = { ...app_name, language };
         if (stack_names !== null ) template = { ...template, Stacks: stack_names ,StackParams};
         if (customStacks !== null)template = { ...template, CustomStacks: customStacks };
-        
-          await rover_utilities.generationSAM(({template})["template"]);
+        await rover_utilities.generationSAM(({template})["template"]);
       }
       
     } else if (editedSam === "add components to existing SAM") {
