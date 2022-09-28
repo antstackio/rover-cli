@@ -38,7 +38,7 @@ async function run(argv:AnyObject) {
        
        
         if (AppType !== "Customizable") {
-          stackname[`stackName${i}`]=util.makeid(2)
+          stackname[`stackName${i}`]=await util.makeid()
           let stack_name = stackname
           let stackName:string = stack_name[`stackName${i}`];
           if (AppType === "CRUD") {

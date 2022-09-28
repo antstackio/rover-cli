@@ -518,7 +518,7 @@ export let langValue=async function () {
   
 }
 
-export let samValidate=function(){
+export let samValidate=async function(){
   try {
     let files:AnyArray=fs.readdirSync(exec("pwd").toString().replace("\n",""))
     let yamlfiles:AnyArray=[]
@@ -541,7 +541,7 @@ export let samValidate=function(){
   }
   
 }
-export let makeid =function (length) {
+export let makeid =async function () {
   const crypto = require('crypto');
   return (crypto.randomBytes(1).toString("base64url").replace(/\d/g, 'd')).toLowerCase();
 }
