@@ -534,10 +534,10 @@ export let samValidate=function(){
     }
     })
     if (!response.includes(true)) {
-      throw("improper SAM Template file")
+      throw new Error("SAM Template error \n")
     }
   } catch (error) {
-    throw("Not a SAM file  :"+error)
+    throw new Error("Not a SAM file  or "+error)
   }
   
 }

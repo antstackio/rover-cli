@@ -82,8 +82,7 @@ async function run(argv:AnyObject) {
       }while(moreStack!=='No'){
         template = { ...app_name, language };
         if (stack_names !== null ) template = { ...template, Stacks: stack_names ,StackParams};
-        if (customStacks !== null)
-          template = { ...template, CustomStacks: customStacks };
+        if (customStacks !== null)template = { ...template, CustomStacks: customStacks };
         
           await rover_utilities.generationSAM(({template})["template"]);
       }
