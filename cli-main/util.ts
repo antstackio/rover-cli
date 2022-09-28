@@ -445,7 +445,6 @@ export let moreStack = async function(message:string){
 
 export let params = async function(module:string){
   let choice:AnyObject = cliConfig.app.choices;
-  let params:AnyObject = {}
   let name:AnyObject ={};
   let res:AnyObject ={};
 if(module==="CRUD"){
@@ -476,13 +475,13 @@ if(module==="CRUD"){
        
     }
   }
-  return params ={
+  return {
     res,
     name: name["name"]
   }
   
   }else{
-    return
+    return {}
   }
 
 
@@ -519,7 +518,7 @@ export let langValue=async function () {
   
 }
 
-export let samValidate=function(){
+export let samValidate=async function(){
   try {
     let files:AnyArray=fs.readdirSync(exec("pwd").toString().replace("\n",""))
     let yamlfiles:AnyArray=[]
@@ -535,14 +534,14 @@ export let samValidate=function(){
     }
     })
     if (!response.includes(true)) {
-      throw("improper SAM Template file")
+      throw new Error("SAM Template error \n")
     }
   } catch (error) {
-    throw("Not a SAM file  :"+error)
+    throw new Error("Not a SAM file  or "+error)
   }
   
 }
-export let makeid =function (length) {
+export let makeid =async function () {
   const crypto = require('crypto');
   return (crypto.randomBytes(1).toString("base64url").replace(/\d/g, 'd')).toLowerCase();
 }
