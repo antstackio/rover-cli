@@ -537,7 +537,7 @@ export let samValidate=async function(){
       throw new Error("SAM Template error \n")
     }
   } catch (error) {
-    throw new Error("Not a SAM file  or "+error)
+    throw new Error("Not a SAM file  or "+error.message)
   }
   
 }

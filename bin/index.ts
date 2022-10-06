@@ -187,7 +187,7 @@ async function run(argv:AnyObject) {
     console.log("Note: install @rover-tools/cli globally (install @rover-tools/cli -g)")
   }
 }catch (error) {
-  console.log("Error: ",error)
+  console.log("Error: ",error.message)
   
 }
 }
