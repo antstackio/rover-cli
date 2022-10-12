@@ -75,8 +75,7 @@ export let inputString = async function (userName: string,defaults:string,option
             if (stringpattern.test(value))passtest=true
             else message=`${userName} should have only alphanumeric values`
             
-          }
-          
+          }  
         }
         if(envpattern.test(userName)){
           let passtest
