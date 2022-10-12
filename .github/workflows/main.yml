@@ -1,4 +1,4 @@
-name: Publish Package to NPM 
+name: Publish Package to NPM
 on:
   release:
     types: [created]
@@ -15,7 +15,10 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-
+          
+      - name: Install Dependicies
+        run : npm install
+          
       - name: Build
         run: npm run build
 
