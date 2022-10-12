@@ -60,27 +60,21 @@ export let inputString = async function (userName: string,defaults:string,option
       name: userName,
       message: message,
       validate: function (value) {
-        let passtest
+
         let message=""
         if (userName=="path"){
-          passtest = apipathpattern.test(value)
-          if (passtest) {
-            
-          }else{
-            message="Please enter a valid path"
-          }      
+          if (apipathpattern.test(value)) return true     
+          else message="Please enter a valid path"
+        }else if(envpattern.test(userName)){
+          if(value!==""&&value!==undefined)return true     
+          else message="environment values cannot be empty"
         }else  {
-          
           if (!optional) {
-            if (stringpattern.test(value))passtest=true
+            if (stringpattern.test(value))return true     
             else message=`${userName} should have only alphanumeric values`
-            
           }  
         }
-        if(envpattern.test(userName)){
-          if(value!==""&&value!==undefined)passtest=true
-          else message="environment values cannot be empty"
-        }
+        
         if(message!=="") return message
         else return true      
     },
