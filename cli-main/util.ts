@@ -53,12 +53,12 @@ export let jsonCreation = async function (obj:any) {
   }
 };
 
-export let inputString = async function (userName: string,defaults:string,optional:boolean, message = "") {
+export let inputString = async function (userName: string,defaults:string,optional:boolean, messages = "") {
   let takeInput = await inquirer.prompt([
     {
       type: "input",
       name: userName,
-      message: message,
+      message: messages,
       validate: function (value) {
 
         let message=""
@@ -71,7 +71,7 @@ export let inputString = async function (userName: string,defaults:string,option
         }else  {
           if (!optional) {
             if (stringpattern.test(value))return true     
-            else message=`${userName} should have only alphanumeric values`
+            else message=`${messages} should have only alphanumeric values`
           }  
         }
         
@@ -478,11 +478,11 @@ if(module==="CRUD"){
        }else{
        
         if(modulesParams[i].key==="name"){
-          let r = await inputString("name","",modulesParams[i].message);
+          let r = await inputString("name","",false,modulesParams[i].message);
           name = r;
 
         }else{
-          let r =  await inputString(modulesParams[i].key,"",modulesParams[i].message)
+          let r =  await inputString(modulesParams[i].key,"",false,modulesParams[i].message)
           res = { ...res, ...r };
         }
        
