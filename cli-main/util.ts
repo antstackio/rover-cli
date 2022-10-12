@@ -15,7 +15,7 @@ const TOML = require('@iarna/toml')
 let pythonpattern=new RegExp(/python[1-9]*\.[1-9]*/g)
 let jspattern=new RegExp(/nodejs[1-9]*\.[a-zA-Z]*/g)
 let yamlpattern=new RegExp(/(\.yaml$)/g)
-let envpattern =new RegExp(/^env[0-9][0-9]+$/g)
+let envpattern =new RegExp(/^env\d\d+$/g)
 let apipathpattern=new RegExp(/^\/[a-zA-Z]*(\/[a-zA-Z]*-*)*/g)
 let stringpattern=new RegExp(/^[A-Za-z]+$/g)
 
@@ -60,17 +60,17 @@ export let inputString = async function (userName: string,defaults:string,option
       name: userName,
       message: message,
       validate: function (value) {
-        let pass=true
+        let passtest
         let message=""
         if (userName=="path"){
-          let passtest = apipathpattern.test(value)
+          passtest = apipathpattern.test(value)
           if (passtest) {
-            pass=true
+            
           }else{
             message="Please enter a valid path"
           }      
         }else  {
-          let passtest
+          
           if (!optional) {
             if (stringpattern.test(value))passtest=true
             else message=`${userName} should have only alphanumeric values`
@@ -78,7 +78,6 @@ export let inputString = async function (userName: string,defaults:string,option
           }  
         }
         if(envpattern.test(userName)){
-          let passtest
           if(value!==""&&value!==undefined)passtest=true
           else message="environment values cannot be empty"
         }

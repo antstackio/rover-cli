@@ -38,7 +38,7 @@ async function run(argv:AnyObject) {
         let AppType:string = await util.appType("Module Type :");
        
         if (AppType !== "Customizable") {
-          stackname[`stackName${i}`]=await "rover"+rover_utilities.NumtoAlpabet(i)
+          stackname[`stackName${i}`]= "rover"+rover_utilities.NumtoAlpabet(i)
           let stack_name = stackname
           let stackName:string = stack_name[`stackName${i}`];
          
@@ -156,7 +156,6 @@ async function run(argv:AnyObject) {
       }
       else {
         await util.samValidate()
-        let pwd =(process.cwd()+"/").trim()
         if(fs.existsSync("samconfig.toml")) {
           exec("rm -rf samconfig.toml")
           
