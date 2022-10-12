@@ -8,13 +8,18 @@ let Yaml = require("js-yaml");
 const exec = require("child_process").execSync;
 const moduleParams = require("@rover-tools/engine").rover_modules;
 const Stack = require("@rover-tools/engine").rover_modules;
+const rover_config = require("@rover-tools/engine").rover_config;
 import { AnyArray, AnyObject } from "immer/dist/internal";
 const rover_utilities=  require("@rover-tools/engine").rover_utilities;
 const TOML = require('@iarna/toml')
 let pythonpattern=new RegExp(/python[1-9]*\.[1-9]*/g)
 let jspattern=new RegExp(/nodejs[1-9]*\.[a-zA-Z]*/g)
 let yamlpattern=new RegExp(/(\.yaml$)/g)
+let envpattern =new RegExp(/^env[0-9][0-9]+$/g)
 let apipathpattern=new RegExp(/^\/[a-zA-Z]*(\/[a-zA-Z]*-*)*/g)
+let stringpattern=new RegExp(/^[A-Za-z]+$/g)
+
+const crypto = require('crypto');
 
 export let s3Choice:any = [];
 export let accesskey:any,secretkey:any;
@@ -48,23 +53,38 @@ export let jsonCreation = async function (obj:any) {
   }
 };
 
-export let inputString = async function (userName: string,defaults:string, message = "") {
+export let inputString = async function (userName: string,defaults:string,optional:boolean, message = "") {
   let takeInput = await inquirer.prompt([
     {
       type: "input",
       name: userName,
       message: message,
       validate: function (value) {
+        let pass=true
+        let message=""
         if (userName=="path"){
-        let pass = apipathpattern.test(value)
-        if (pass) {
-          return true
+          let passtest = apipathpattern.test(value)
+          if (passtest) {
+            pass=true
+          }else{
+            message="Please enter a valid path"
+          }      
+        }else  {
+          let passtest
+          if (!optional) {
+            if (stringpattern.test(value))passtest=true
+            else message=`${userName} should have only alphanumeric values`
+            
+          }
+          
         }
-        return "Please enter a valid path"
-        }else{
-          return true
+        if(envpattern.test(userName)){
+          let passtest
+          if(value!==""&&value!==undefined)passtest=true
+          else message="environment values cannot be empty"
         }
-      
+        if(message!=="") return message
+        else return true      
     },
   },
   ]);
@@ -130,11 +150,11 @@ export let inputNumber = async function (userName: string,message:string) {
       message: `Please enter the required number of ${displayname} you want ?`,
       name: `${userName}`,
       validate: function (value) {
-        let pass = !isNaN(value)
+        let pass = !isNaN(value) && value>0
         if (pass) {
           return true
         }
-        return 'Please enter a valid number'
+        return 'Please enter a valid number greater than 0'
        
       },
     },
@@ -271,7 +291,7 @@ export let inputCli = async function (
           .map(({ key, value }) => key);
         res[sobj.key] = choiceNames[0];
       } else {
-        let name = await inputString("name","", `${sobj.message}-->Name`);
+        let name = await inputString("name","",false, `${sobj.message}-->Name`);
         
         let temp = name;
 
@@ -355,7 +375,7 @@ Object.assign(temp,ele)
   let deploymentparameters: any = {};
   let depBucketNames: any = {};
   for (let i = 1; i <= no_of_env; i++) {
-    let env = await inputString(`env${i}`,"",`Envrionment ${i} :`);
+    let env = await inputString(`env${i}`,"",false,`Envrionment ${i} :`);
     let envName = env[`env${i}`];
     envs.push(envName);
     let stepsChoice = buildConfig.samConfig.choices.dev;
@@ -369,19 +389,20 @@ Object.assign(temp,ele)
 
     let stackname = await inputString(
       `${envName}`,
-      "",
+      "",true,
+      
       `Stack Name(optional) --> ${envName} :`
     );
     let deploymentbucket = await inputString(
       `${envName}`,
-      "",
+      "",true,
       `Deployment Bucket(optional) --> ${envName} :`
     );
     let regionChoice = buildConfig.samConfig.choices.deploymentregion;
     let deployment_region = await inputType(`${envName}`, regionChoice,"Deployment Region");
     let deployment_parameter = await inputString(
       `${envName}`,
-      "",
+      "",true,
       `Deployment Parameter(optional) --> ${envName} :`
     );
     steps = { ...steps,...steps1 };
@@ -537,11 +558,11 @@ export let samValidate=async function(){
       throw new Error("SAM Template error \n")
     }
   } catch (error) {
-    throw new Error("Not a SAM file  or "+error.message)
+    throw new Error("Not a SAM file or "+error.message)
   }
   
 }
 export let makeid =async function () {
-  const crypto = require('crypto');
+  
   return (crypto.randomBytes(1).toString("base64url").replace(/\d/g, 'd')).toLowerCase();
 }

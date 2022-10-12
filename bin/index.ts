@@ -1,5 +1,6 @@
 const rover_utilities=  require("@rover-tools/engine").rover_utilities;
-
+const rover_config=  require("@rover-tools/engine").rover_config;
+let fs = require("fs");
 import * as cliConfig from "../cli-main/cliConfig";
 import * as util from "../cli-main/util";
 const deployment= require("@rover-tools/engine").rover_deployment;
@@ -19,7 +20,7 @@ async function run(argv:AnyObject) {
   if (argv[0] === "init") {
     let editedSam = await util.confirmation();
     if (editedSam === "create new SAM project") {
-      let app_name:object = await util.inputString("app_name","", "App Name:");
+      let app_name:object = await util.inputString("app_name","",false, "App Name:");
       await rover_utilities.checkFile(app_name["app_name"],"no")
       let language = await util.languageChoice();
       let stack_names: any = {};
@@ -36,11 +37,11 @@ async function run(argv:AnyObject) {
         let app_Types: any = [];
         let AppType:string = await util.appType("Module Type :");
        
-       
         if (AppType !== "Customizable") {
-          stackname[`stackName${i}`]=await util.makeid()
+          stackname[`stackName${i}`]=await "rover"+rover_utilities.NumtoAlpabet(i)
           let stack_name = stackname
           let stackName:string = stack_name[`stackName${i}`];
+         
           if (AppType === "CRUD") {
             let crud:AnyObject={} ;
             let tempObj = {};
@@ -70,7 +71,7 @@ async function run(argv:AnyObject) {
           let choice = cliConfig.customizable.choice;
           let customstack_name = await util.inputString(
             `customStackName${i}`,
-            "",
+            "",false,
             `Stack ${i} Name: `
           );
           let CustomStacks = await util.multichoice("app_type", choice);
@@ -88,7 +89,7 @@ async function run(argv:AnyObject) {
       
     } else if (editedSam === "add components to existing SAM") {
       
-      let app_name = await util.inputString("app_name","", "App Name");
+      let app_name = await util.inputString("app_name","",false, "App Name");
       await rover_utilities.checkFile(app_name["app_name"],"yes")
      
       let language = await util.languageChoice();
@@ -103,12 +104,10 @@ async function run(argv:AnyObject) {
         if (nested) {
           let chooseStack = await util.inputType("Select the module to which you want to add the components ", choice);
           let selectedchoice = choice.filter((ele) => Object.values(chooseStack).includes(ele));
-          choice = choice.filter((ele) => ele !== selectedchoice[0]);
           let componentChoice = cliConfig.customizable.choice;
           let components = await util.multichoice("type", componentChoice);
           let path = CompStacks["CompStacks"][selectedchoice[0]];
           nestedComponents[selectedchoice[0]] = { ...components, path: path };
-
           template = {
             ...app_name,
             language,
@@ -127,12 +126,10 @@ async function run(argv:AnyObject) {
               ...Compnents
             };
         }
-        if(choiceLength===1 || !nested){
-          break;
-        }else{
+        
           moreStack = await util.moreStack("Do you want to add one more components to modules ?")
+          console.log(moreStack)
         i++;
-        }
         
       } while (moreStack !== "No"|| choiceLength===0)
       
@@ -159,10 +156,15 @@ async function run(argv:AnyObject) {
       }
       else {
         await util.samValidate()
+        let pwd =(process.cwd()+"/").trim()
+        if(fs.existsSync("samconfig.toml")) {
+          exec("rm -rf samconfig.toml")
+          
+        }
         let filenamearray=(exec("pwd").toString()).split("/")
         let file_name = filenamearray[filenamearray.length-1].replace("\n","");
-        let stack_name = await util.inputString("stack_name","","Stack Name(optional) :")
-        let bucketName = await util.inputString("name","","Bucket Name(optional) :");
+        let stack_name = await util.inputString("stack_name","",true,"Stack Name(optional) :")
+        let bucketName = await util.inputString("name","",true,"Bucket Name(optional) :");
         let choice = buildConfig.samConfig.choices.deploymentregion;
         let deploymentregion = await util.inputType("Deployment region",choice);
         if (bucketName["name"]=="") {
@@ -173,7 +175,7 @@ async function run(argv:AnyObject) {
         if (stack_name["stack_name"]=="") {stack_name=file_name+"roverTest"}else{stack_name=stack_name["stack_name"]}
         let region=deploymentregion["Deployment region"]
        
-        exec("sh " + rover_utilities.npmroot +"/@rover-tools/cli/cli-main/exec.sh "+file_name+" "+stack_name+" "+region+" "+bucketName);
+        exec("sh " + rover_config.npmroot +"/@rover-tools/cli/cli-main/exec.sh "+file_name+" "+stack_name+" "+region+" "+bucketName);
         
       }
     } else {
