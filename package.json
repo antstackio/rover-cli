@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
-    "@rover-tools/engine": "^0.0.47",
+    "@rover-tools/engine": "file:../rover-engine",
     "@types/inquirer": "^8.2.1",
     "esm": "^3.2.25",
     "immer": "^9.0.14",
@@ -25,6 +25,7 @@
     "start": "tsc   bin/init.ts && tsc  bin/index.ts && npm install -g . ",
     "build": "tsc",
     "watch": "tsc --watch",
+    "localtest": "npm install /Users/dheerajbhatt/proj/rover-engine && npm run build && npm install /Users/dheerajbhatt/proj/rover-cli -g  ",
     "prepack": "npm run clean && npm run build "
   },
   "bin": {
@@ -44,5 +45,8 @@
   "bugs": {
     "url": "https://github.com/antstackio/rover-cli/issues"
   },
-  "homepage": "https://github.com/antstackio/rover-cli#readme"
+  "homepage": "https://github.com/antstackio/rover-cli#readme",
+  "workspaces": [
+    "../rovertest/test"
+  ]
 }

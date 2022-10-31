@@ -7,20 +7,23 @@ const deployment= require("@rover-tools/engine").rover_deployment;
 import * as buildConfig from "../cli-main/buildConfig";
 import { AnyObject } from "immer/dist/internal";
 const exec = require("child_process").execSync;
-
+import {  version } from "../package.json";
 let res: any = [];
 let resources: any = [];
 let stack_resource_Name: any = [];
 let AppType;
 let template = {};
 let config;
+let appname
 async function run(argv:AnyObject) {
   try{
+    console.log(version)
   if(rover_utilities.npmrootTest()){
   if (argv[0] === "init") {
     let editedSam = await util.confirmation();
     if (editedSam === "create new SAM project") {
       let app_name:object = await util.inputString("app_name","",false, "App Name:");
+      appname=app_name["app_name"]
       await rover_utilities.checkFile(app_name["app_name"],"no")
       let language = await util.languageChoice();
       let stack_names: any = {};
@@ -188,7 +191,8 @@ async function run(argv:AnyObject) {
     console.log("Note: install @rover-tools/cli globally (install @rover-tools/cli -g)")
   }
 }catch (error) {
-  console.log("Error: ",error.message)
+  exec("rm -rf "+appname)
+  console.log("Error: ",error)
   
 }
 }
