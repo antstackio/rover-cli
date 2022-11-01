@@ -359,13 +359,14 @@ Object.assign(temp,ele)
   })
   sam=temp
   sam["language"]=lang
-  let no_of_env = await inputNumber("no_of_env","environments/branch");
+  let no_of_env = await inputNumber("no_of_env","environments");
   let envs: string[] = [];
   let steps: any = {};
   let stacknames: any = {};
   let deploymentregion: any = {};
   let deploymentparameters: any = {};
   let depBucketNames: any = {};
+  let branches = { "branches":["main"]}
   for (let i = 1; i <= no_of_env; i++) {
     let env = await inputString(`env${i}`,"",false,`Envrionment ${i} :`);
     let envName = env[`env${i}`];
@@ -417,6 +418,7 @@ Object.assign(temp,ele)
     ...accesskey,
     ...secretkey,
     envs,
+    ...branches,
     ...framework,
     steps,
     stackname: { ...stacknames },
