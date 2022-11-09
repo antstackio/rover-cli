@@ -1,5 +1,5 @@
 
-const customStack= require("@rover-tools/engine").rover_components;
+const rovercomponents = require("@rover-tools/engine").rover_components;
 const Stack = require("@rover-tools/engine").rover_modules;
 export let LanguageSupport = {
   node: {
@@ -13,6 +13,12 @@ export let LanguageSupport = {
     extension: ".py",
   },
 };
+let keys = []
+let values=[]
+  Stack.ModuleDescription.filter(ele => {
+    keys.push(ele["key"])
+     values.push(ele["value"])
+   })
 export let app =
 {
   choices:{
@@ -25,5 +31,9 @@ export let app =
  
 }
 export let customizable ={
- choice : Object.keys(customStack.Components)
+  components: Object.keys(rovercomponents.Components),
+  modules: {
+    "keys": keys,
+    "values":values,
+  }
 }
