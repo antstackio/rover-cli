@@ -16,24 +16,45 @@ let stack_resource_Name: any = [];
 let AppType;
 let template = {};
 let config;
-async function run(argv: AnyObject) {
-  try {
-    if (rover_utilities.npmrootTest()) {
-      const commandError = `rover ${argv.join(
-        " "
-      )} -is not a rover command \n  rover init   - creates new SAM project \n  rover deploy - deploys SAM project`;
-      if (argv.length === 1) {
-        if (argv.length === 1 && argv[0] === "init") {
-          let editedSam = await util.confirmation();
-          if (editedSam === "create new SAM project") {
-            let app_name: object = await util.inputString(
-              "app_name",
-              "",
-              false,
-              "App Name:"
-            );
-            await rover_utilities.checkFile(app_name["app_name"], "no");
-            let language = await util.languageChoice();
+async function roverADD() { 
+        let app_name = await util.inputString("app_name", "", false, "App Name");
+        await rover_utilities.samValidate(app_name["app_name"]);
+        await rover_utilities.checkFile(app_name["app_name"], "yes");
+        let language = await util.languageChoice();
+        let file_name = await exec("ls " + app_name["app_name"] + "/" + "*.yaml ").toString();
+        let CompStacks = await rover_utilities.checkNested(file_name);
+        return { "appname": app_name, "language": language, "filename": file_name,"compstack":CompStacks }
+}
+async function CRUDObject(stackName,AppType) {
+    let crud: AnyObject = {};
+    let StackParams: AnyObject = {};
+    let paramModule: AnyObject = {};
+    let obj: AnyObject = {};
+    let tempObj = {};
+    
+    do {
+      paramModule =   await util.params(AppType);
+      paramModule["res"]["resourcetype"] = "lambda";
+      paramModule["res"]["methods"].push("options");
+      crud[paramModule.name] = paramModule.res;
+
+      obj[stackName] = crud;
+      tempObj = { ...tempObj, crud };
+      moreStack =  await util.moreStack("Do you want to add another API ?");
+    } while (moreStack !== "No");
+    StackParams = { ...obj };
+    
+    return StackParams
+} 
+async function CustomObject(i) { 
+  let customStacks: any = {};
+  let choice = cliConfig.customizable.components;
+  let customstack_name = await util.inputString(`customStackName${i}`,"",false,`Stack ${i} Name: `);
+  let CustomStacks = await util.multichoice("app_type", choice);
+  customStacks[customstack_name[`customStackName${i}`]] = CustomStacks.app_type;
+  return customStacks
+} 
+async function createModules(app_name,language) {
             let stack_names: any = {};
             let customStacks: any = {};
             let paramModule: AnyObject = {};
@@ -46,95 +67,76 @@ async function run(argv: AnyObject) {
             do {
               let app_Types: any = [];
               let AppType: string = await util.appType("Module Type :");
-
               if (AppType !== "Customizable") {
-                stackname[`stackName${i}`] =
-                  "rover" + rover_utilities.NumtoAlpabet(i);
-                let stack_name = stackname;
-                let stackName: string = stack_name[`stackName${i}`];
-
-                if (AppType === "CRUD") {
-                  let crud: AnyObject = {};
-                  let tempObj = {};
-                  do {
+                  stackname[`stackName${i}`] ="rover" + rover_utilities.makeid(5);
+                  let stack_name = stackname;
+                  let stackName: string = stack_name[`stackName${i}`];
+                  if (AppType === "CRUD") {
+                    StackParams = { ...StackParams,... await CRUDObject(stackName,AppType)}; 
+                  } else {
                     paramModule = await util.params(AppType);
-                    paramModule["res"]["resourcetype"] = "lambda";
-                    paramModule["res"]["methods"].push("options");
-                    crud[paramModule.name] = paramModule.res;
-
-                    obj[stackName] = crud;
-                    tempObj = { ...tempObj, crud };
-                    moreStack = await util.moreStack(
-                      "Do you want to add another API ?"
-                    );
-                  } while (moreStack !== "No");
-
-                  StackParams = { ...obj };
-                } else {
-                  paramModule = await util.params(AppType);
-                  obj[stackName] = basecrud;
-                  StackParams = { ...obj };
-                }
-
-                stack_names[stack_name[`stackName${i}`]] = AppType;
+                    obj[stackName] = basecrud;
+                    StackParams = { ...obj };
+                  }
+                  stack_names[stack_name[`stackName${i}`]] = AppType;
               } else {
-                let choice = cliConfig.customizable.choice;
-                let customstack_name = await util.inputString(
-                  `customStackName${i}`,
-                  "",
-                  false,
-                  `Stack ${i} Name: `
-                );
-                let CustomStacks = await util.multichoice("app_type", choice);
-                customStacks[customstack_name[`customStackName${i}`]] =
-                  CustomStacks.app_type;
+                customStacks = {...customStacks, ... await CustomObject(i) }
               }
               moreStack = await util.moreStack(
                 "Do you want to add one more modules ? "
               );
               i++;
             } while (moreStack !== "No");
-            {
+            
               template = { ...app_name, language };
               if (stack_names !== null)
                 template = { ...template, Stacks: stack_names, StackParams };
               if (customStacks !== null)
                 template = { ...template, CustomStacks: customStacks };
-              await rover_utilities.generationSAM({ template }["template"]);
-            }
-          } else if (editedSam === "add components to existing SAM") {
-            let app_name = await util.inputString(
+              return template
+  
+}
+async function run(argv: AnyObject) {
+  try {
+    if (rover_utilities.npmrootTest()) {
+      const commandError = `rover ${argv.join(
+        " "
+      )} -is not a rover command \n  rover init   - creates new SAM project \n  rover deploy - deploys SAM project\n rover -v or rover --version - gives installed rover version` ;
+      if (argv.length === 1) {
+        if (argv.length === 1 && argv[0] === "init") {
+          let editedSam = await util.confirmation();
+          if (editedSam === "create new SAM project") {
+            let app_name: object = await util.inputString(
               "app_name",
               "",
               false,
-              "App Name"
+              "App Name:"
             );
-            await rover_utilities.checkFile(app_name["app_name"], "yes");
-
+            await rover_utilities.checkFile(app_name["app_name"], "no");
             let language = await util.languageChoice();
-            let file_name = await exec(
-              "ls " + app_name["app_name"] + "/" + "*.yaml "
-            ).toString();
+            
+            template= await createModules(app_name,language)
+             await rover_utilities.generateSAM({ template }["template"]);
+            
+          } else if (editedSam === "add components to existing SAM") {
+
+            let app_name = await util.inputString("app_name","",false,"App Name");
+            await rover_utilities.checkFile(app_name["app_name"], "yes");
+            let language = await util.languageChoice();
+            let file_name = await exec("ls " + app_name["app_name"] + "/" + "*.yaml ").toString();
             let CompStacks = await rover_utilities.checkNested(file_name);
             let nestedComponents: AnyObject = {};
             let choice = Object.keys(CompStacks["CompStacks"]);
             let choiceLength = 0;
+
             do {
               let nested = CompStacks["checkNested"];
               choiceLength = choice.length;
               if (nested) {
-                let chooseStack = await util.inputType(
-                  "Select the module to which you want to add the components ",
-                  choice
-                );
-                let selectedchoice = choice.filter((ele) =>
-                  Object.values(chooseStack).includes(ele)
-                );
-                let componentChoice = cliConfig.customizable.choice;
-                let components = await util.multichoice(
-                  "type",
-                  componentChoice
-                );
+                let chooseStack = await util.inputType("Select the module to which you want to add the components ", choice);
+                let selectedchoice = choice.filter((ele) =>Object.values(chooseStack).includes(ele));
+                let componentChoice = cliConfig.customizable.components;
+                let components = await util.multichoice("components",componentChoice);
                 let path = CompStacks["CompStacks"][selectedchoice[0]];
                 nestedComponents[selectedchoice[0]] = {
                   ...components,
@@ -148,7 +150,7 @@ async function run(argv: AnyObject) {
                   nestedComponents
                 };
               } else {
-                let choice = cliConfig.customizable.choice;
+                let choice = cliConfig.customizable.components;
                 let Compnents = await util.multichoice("components", choice);
                 template = { ...app_name, language };
                 if (customStacks !== null)
@@ -158,17 +160,24 @@ async function run(argv: AnyObject) {
                     ...Compnents
                   };
               }
-
+              
               moreStack = await util.moreStack(
                 "Do you want to add one more components to modules ?"
               );
-              console.log(moreStack);
+              
               i++;
             } while (moreStack !== "No" || choiceLength === 0);
-
             await rover_utilities.addComponents(template);
           } else if (editedSam === "add modules to existing SAM") {
-            console.log("Work in progress...");
+            let res = await roverADD()
+            let app_name = res["appname"]
+            let language =res["language"]
+            let file_name =res["filename"]
+            let CompStacks = res["compstack"]
+             
+            template = await createModules(app_name , language)
+            template["file_name"] = file_name
+            await rover_utilities.addModules(template);
           }
         } else if (argv[0] === "deploy") {
           let r = await util.inputType("choice", "pipeline", "Deploy through:");
@@ -176,8 +185,8 @@ async function run(argv: AnyObject) {
           if (r === "repository and pipeline") {
             console.log("Work in progress...");
           } else if (r === "generate pipeline") {
-            await util.samValidate();
-            let lang: string = await util.langValue();
+            await rover_utilities.samValidate(undefined);
+            let lang: string = await rover_utilities.langValue();
             let pipeline = await util.samBuild(lang);
             let repoConfig = { ...pipeline };
             template = { ...template, repoConfig };
@@ -186,7 +195,7 @@ async function run(argv: AnyObject) {
               await deployment.setupRepo(JSON.parse(repoconfig)["repoConfig"]);
             }
           } else {
-            await util.samValidate();
+            await rover_utilities.samValidate(undefined);
             if (fs.existsSync("samconfig.toml")) {
               exec("rm -rf samconfig.toml");
             }
@@ -255,7 +264,6 @@ async function run(argv: AnyObject) {
     console.log("Error: ", error.message);
   }
 }
-
 export let stackNames: any = stack_resource_Name;
 let moreStack;
 let customStacks: AnyObject;

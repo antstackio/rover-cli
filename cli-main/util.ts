@@ -12,23 +12,20 @@ const rover_config = require("@rover-tools/engine").rover_config;
 import { AnyArray, AnyObject } from "immer/dist/internal";
 const rover_utilities=  require("@rover-tools/engine").rover_utilities;
 const TOML = require('@iarna/toml')
-let pythonpattern=new RegExp(/python[1-9]*\.[1-9]*/g)
-let jspattern=new RegExp(/nodejs[1-9]*\.[a-zA-Z]*/g)
-let yamlpattern=new RegExp(/(\.yaml$)/g)
+
 let envpattern =new RegExp(/^env\d\d+$/g)
 let apipathpattern=new RegExp(/^\/[a-zA-Z]*(\/[a-zA-Z]*-*)*/g)
 let stringpattern=new RegExp(/^[A-Za-z]+$/g)
 
-const crypto = require('crypto');
-
 export let s3Choice:any = [];
 export let accesskey:any,secretkey:any;
 
-export let multichoice = async function (name:string, choice:any) {
+export let multichoice = async function (name: string, choice: any, messages = []) {
+  if (messages = [])"Please select your "+ name.charAt(0).toUpperCase() + name.slice(1)+" :"
   let r = await inquirer.prompt([
     {
       type: "checkbox",
-      message:  "Please select your "+ name.charAt(0).toUpperCase() + name.slice(1)+" :",
+      message:  messages,
       name: name,
       choices: choice,
       validate(answer) {
@@ -465,6 +462,7 @@ export let params = async function(module:string){
 if(module==="CRUD"){
   let modulesParams= moduleParams.ModuleParams.CRUD.params;
   let paramslength = modulesParams.length;
+  
   if(paramslength>0){
     
     for(let i=0;i<paramslength;i++){
@@ -508,55 +506,6 @@ if(module==="CRUD"){
   
 }
 
-export let langValue=async function () {
-  
-  let pwd =(process.cwd()+"/").trim()
-  if(!fs.existsSync(pwd+".aws-sam/build.toml"))exec("sam build")
-  let data=fs.readFileSync(pwd+".aws-sam/build.toml", { encoding: "utf-8" })
-  data=TOML.parse(data)
-  let langarray:AnyArray=[]
-  let jsresult:AnyArray=[]
-  let pyresult:AnyArray=[]
-  Object.keys(data).forEach(ele=>{
-    Object.keys(data[ele]).forEach(obj=>{
-      if(data[ele][obj].hasOwnProperty("runtime"))langarray.push(data[ele][obj]["runtime"])})
-    }
-    )
-  langarray.forEach(ele=>{
-      if (ele.match(jspattern)!==null)jsresult.push(...ele.match(jspattern))
-      if (ele.match(pythonpattern)!==null)pyresult.push(...ele.match(pythonpattern))
-  
-  })
-  if(jsresult.length>pyresult.length) return "js"
-  else if(pyresult.length>jsresult.length) return "python"
-  else return "js"
-  
-}
 
-export let samValidate=async function(){
-  try {
-    let files:AnyArray=fs.readdirSync(exec("pwd").toString().replace("\n",""))
-    let yamlfiles:AnyArray=[]
-    let response:AnyArray=[]
-    files.map(ele=>{if (ele.match(yamlpattern)!==null)yamlfiles.push(ele)})
-    yamlfiles.map(ele=>{
-      let data=fs.readFileSync(ele,{ encoding: "utf-8" })
-      data=Yaml.load(rover_utilities.replaceTempTag(data))
-      if(data.hasOwnProperty("AWSTemplateFormatVersion")
-      &&data.hasOwnProperty("Transform")
-      &&data.hasOwnProperty("Description")
-      &&data.hasOwnProperty("Resources")){response.push(true)
-    }
-    })
-    if (!response.includes(true)) {
-      throw new Error("SAM Template error \n")
-    }
-  } catch (error) {
-    throw new Error("Not a SAM file or "+error.message)
-  }
-  
-}
-export let makeid =async function () {
-  
-  return (crypto.randomBytes(1).toString("base64url").replace(/\d/g, 'd')).toLowerCase();
-}
+
+
