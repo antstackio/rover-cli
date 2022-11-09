@@ -17,11 +17,11 @@ let envpattern =new RegExp(/^env\d\d+$/g)
 let apipathpattern=new RegExp(/^\/[a-zA-Z]*(\/[a-zA-Z]*-*)*/g)
 let stringpattern=new RegExp(/^[A-Za-z]+$/g)
 
-export let s3Choice:any = [];
+export let s3Choice:AnyArray = [];
 export let accesskey:any,secretkey:any;
 
-export let multichoice = async function (name: string, choice: any, messages = []) {
-  if (messages = [])"Please select your "+ name.charAt(0).toUpperCase() + name.slice(1)+" :"
+export let multichoice = async function (name: string, choice: any) {
+  let messages ="Please select your "+ name.charAt(0).toUpperCase() + name.slice(1)+" :"
   let r = await inquirer.prompt([
     {
       type: "checkbox",

@@ -74,7 +74,7 @@ async function createModules(app_name,language) {
                   if (AppType === "CRUD") {
                     StackParams = { ...StackParams,... await CRUDObject(stackName,AppType)}; 
                   } else {
-                    paramModule = await util.params(AppType);
+                    
                     obj[stackName] = basecrud;
                     StackParams = { ...obj };
                   }
@@ -173,7 +173,6 @@ async function run(argv: AnyObject) {
             let app_name = res["appname"]
             let language =res["language"]
             let file_name =res["filename"]
-            let CompStacks = res["compstack"]
              
             template = await createModules(app_name , language)
             template["file_name"] = file_name
