@@ -96,6 +96,11 @@ async function createModules(app_name,language) {
               return template
   
 }
+async function listProfiles() {
+  let profiles = (exec("aws configure list-profiles").toString()).split("\n")
+  if (profiles[profiles.length - 1] == "") profiles.splice(profiles.length - 1, 1)
+  return profiles
+}
 async function run(argv: AnyObject) {
   try {
     if (rover_utilities.npmrootTest()) {
@@ -191,13 +196,16 @@ async function run(argv: AnyObject) {
             template = { ...template, repoConfig };
             let repoconfig = await Promise.resolve(util.jsonCreation(template));
             if (repoconfig !== undefined) {
+              
               await deployment.setupRepo(JSON.parse(repoconfig)["repoConfig"]);
+              rover_utilities.generateRoverConfig("",JSON.parse(repoconfig)["repoConfig"],"rover_generate_pipeline")
             }
           } else {
             await rover_utilities.samValidate(undefined);
             if (fs.existsSync("samconfig.toml")) {
               exec("rm -rf samconfig.toml");
             }
+            let profiles=await listProfiles()
             let filenamearray = exec("pwd").toString().split("/");
             let file_name = filenamearray[filenamearray.length - 1].replace(
               "\n",
@@ -216,6 +224,8 @@ async function run(argv: AnyObject) {
               "Bucket Name(optional) :"
             );
             let choice = buildConfig.samConfig.choices.deploymentregion;
+            let profile = (await util.inputType("AWS profile", profiles))["AWS profile"]
+            console.log(profile)
             let deploymentregion = await util.inputType(
               "Deployment region",
               choice
@@ -232,18 +242,15 @@ async function run(argv: AnyObject) {
             }
             let region = deploymentregion["Deployment region"];
 
-            exec(
-              "sh " +
-                rover_config.npmroot +
-                "/@rover-tools/cli/cli-main/exec.sh " +
-                file_name +
-                " " +
-                stack_name +
-                " " +
-                region +
-                " " +
-                bucketName
-            );
+            exec("sh " + rover_config.npmroot + "/@rover-tools/cli/cli-main/exec.sh " + file_name + " " + stack_name + " " + region + " " + bucketName + " "+profile);
+            
+            let configdata = {}
+            configdata["bucket"] = bucketName
+            configdata["stack name"] = stack_name
+            configdata["region"] = region
+            configdata["bucket"] = bucketName``
+            configdata["profile"] = profile
+            rover_utilities.generateRoverConfig("",configdata,"rover_deploy_cli")
           }
         } else if (argv[0] === "-v" || argv[0] === "--version") {
           // show current package version in the console
@@ -260,7 +267,7 @@ async function run(argv: AnyObject) {
       );
     }
   } catch (error) {
-    console.log("Error: ", error.message);
+    console.log("Error: ", error);
   }
 }
 export let stackNames: any = stack_resource_Name;
