@@ -68,7 +68,7 @@ async function createModules(app_name,language) {
               let app_Types: any = [];
               let AppType: string = await util.appType("Module Type :");
               if (AppType !== "Customizable") {
-                  stackname[`stackName${i}`] ="rover" + rover_utilities.makeid(5);
+                  stackname[`stackName${i}`] =rover_utilities.makeid(5)+"_";
                   let stack_name = stackname;
                   let stackName: string = stack_name[`stackName${i}`];
                   if (AppType === "CRUD") {
@@ -76,7 +76,7 @@ async function createModules(app_name,language) {
                   } else {
                     
                     obj[stackName] = basecrud;
-                    StackParams = { ...obj };
+                    StackParams = { ...obj ,...StackParams};
                   }
                   stack_names[stack_name[`stackName${i}`]] = AppType;
               } else {
@@ -120,7 +120,7 @@ async function run(argv: AnyObject) {
             await rover_utilities.checkFile(app_name["app_name"], "no");
             let language = await util.languageChoice();
             
-            template= await createModules(app_name,language)
+            template = await createModules(app_name, language)
              await rover_utilities.generateSAM({ template }["template"]);
             
           } else if (editedSam === "add components to existing SAM") {
@@ -248,7 +248,6 @@ async function run(argv: AnyObject) {
             configdata["bucket"] = bucketName
             configdata["stack name"] = stack_name
             configdata["region"] = region
-            configdata["bucket"] = bucketName``
             configdata["profile"] = profile
             rover_utilities.generateRoverConfig("",configdata,"rover_deploy_cli")
           }
