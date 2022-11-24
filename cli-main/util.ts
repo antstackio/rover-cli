@@ -246,14 +246,14 @@ export let inputCli = async function (
       res[`${sobj.key}`] = objListArr;
     } else if (sobj.value === "multipleChoice") {
       if (sobj.key === "Action") {
-        let choice = init.stackNames.map(({ key, value }) => value);
-        choice = choice.filter((item, pos) => choice.indexOf(item) == pos);
+        let choice = init.stackNames.map(({ key, value }:AnyObject) => value);
+        choice = choice.filter((item:string, pos:number) => choice.indexOf(item) == pos);
         let p = await inputType(sobj.key, choice,sobj.message);
         choice = obj.choices[p];
 
         let r = await multichoice(p, choice);
 
-        let actionArr = r[p].map((ele) => `${p}:${ele}`);
+        let actionArr = r[p].map((ele:string) => `${p}:${ele}`);
         res = { Action: actionArr };
       } else {
         let choice = obj.choices[sobj.key];
@@ -261,23 +261,23 @@ export let inputCli = async function (
         res = { ...res, ...r };
       }
     } else if (sobj.value === "choiceReference") {
-      let choice = init.stackNames.map(({ key, value }) => value);
-      choice = choice.filter((item, pos) => choice.indexOf(item) == pos);
+      let choice = init.stackNames.map(({ key, value }:AnyObject) => value);
+      choice = choice.filter((item:AnyObject, pos:number) => choice.indexOf(item) == pos);
       if (
         (sobj.key === "resource" || sobj.key === "Ref") &&
         choice.length > 0
       ) {
         let p = await inputType(sobj.key, choice);
         let choiceNames = init.stackNames
-          .filter(({ key, value }) => value === p)
-          .map(({ key, value }) => key);
+          .filter(({ key, value }:AnyObject) => value === p)
+          .map(({ key, value }:AnyObject) => key);
         let r = await inputType(p, choiceNames);
         
         res[`${sobj.key}`] = r;
       } else if (sobj.key === "role" && choice.indexOf("iamrole") !== -1) {
         let choiceNames = init.stackNames
-          .filter(({ key, value }) => value === "iamrole")
-          .map(({ key, value }) => key);
+          .filter(({ key, value }:AnyObject) => value === "iamrole")
+          .map(({ key, value }:AnyObject) => key);
         res[sobj.key] = choiceNames[0];
       } else {
         let name = await inputString("name","",false, `${sobj.message}-->Name`);
@@ -346,11 +346,11 @@ export let password = async function(userName:string,message:string=""){
   return r;
 }
 
-export let samBuild = async function (lang) {
+export let samBuild = async function (lang:string) {
   let obj = buildConfig.samConfig;
   let subObj = buildConfig.samConfig.samBuild;
-  let sam:object = await inputCli(obj, subObj, "");
-  let temp:object={}
+  let sam:AnyObject = await inputCli(obj, subObj, "");
+  let temp:AnyObject={}
   Object.values(sam).map(ele=>{
 Object.assign(temp,ele)
   })
@@ -370,7 +370,7 @@ Object.assign(temp,ele)
     envs.push(envName);
     let stepsChoice = buildConfig.samConfig.choices.dev;
     let step = await multichoice("steps required for "+`${envName}`+" environment " , stepsChoice);
-    let steps1:object={}
+    let steps1:AnyObject={}
     step=Object.keys(step).map(ele=>{
       let name:string=ele.replace("steps required for ","")
       name=name.replace(" environment ","")
@@ -459,8 +459,8 @@ export let params = async function(module:string){
   let choice:AnyObject = cliConfig.app.choices;
   let name:AnyObject ={};
   let res:AnyObject ={};
-if(module==="CRUD"){
-  let modulesParams= moduleParams.ModuleParams.CRUD.params;
+if(module==="CRUDModule"){
+  let modulesParams= moduleParams.ModuleParams.CRUDModule.params;
   let paramslength = modulesParams.length;
   
   if(paramslength>0){
