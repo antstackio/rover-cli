@@ -16,92 +16,7 @@ let stack_resource_Name: any = [];
 let AppType;
 let template:AnyObject = {};
 let config;
-let testdata={
-  "app_name": "teststruct",
-  "language": "node",
-  "Stacks": {
-    "BaseModuleRlbao": "BaseModule",
-    "BaseModuleKogle": "BaseModule",
-    "EmailAuthModulePsaih": "EmailAuthModule",
-    "EmailAuthModuleWjzvl": "EmailAuthModule",
-    "RDSModuleLzxxx": "RDSModule",
-    "RDSModuleCnxwn": "RDSModule",
-    "CRUDModuleVuayw": "CRUDModule",
-    "CRUDModuleWwaex": "CRUDModule"
-  },
-  "StackParams": {
-    "BaseModuleRlbao": {},
-    "BaseModuleKogle": {},
-    "EmailAuthModulePsaih": {},
-    "EmailAuthModuleWjzvl": {},
-    "RDSModuleLzxxx": {},
-    "RDSModuleCnxwn": {},
-    "CRUDModuleVuayw": {
-      "Book": {
-        "path": "/book",
-        "methods": [
-          "put",
-          "get",
-          "post",
-          "delete",
-          "options"
-        ],
-        "resourcetype": "lambda"
-      },
-      "Author": {
-        "path": "/author",
-        "methods": [
-          "put",
-          "get",
-          "post",
-          "delete",
-          "options"
-        ],
-        "resourcetype": "lambda"
-      }
-    },
-    "CRUDModuleWwaex": {
-      "Book": {
-        "path": "/Book",
-        "methods": [
-          "put",
-          "get",
-          "post",
-          "delete",
-          "options"
-        ],
-        "resourcetype": "lambda"
-      },
-      "Author": {
-        "path": "/author",
-        "methods": [
-          "put",
-          "get",
-          "post",
-          "delete",
-          "options"
-        ],
-        "resourcetype": "lambda"
-      }
-    }
-  },
-  "CustomStacks": {
-    "custom": [
-      "S3 Lambda",
-      "CRUD API",
-      "S3 Bucket",
-      "Lambda",
-      "DynamoDB"
-    ],
-    "custo": [
-      "S3 Lambda",
-      "CRUD API",
-      "S3 Bucket",
-      "Lambda",
-      "DynamoDB"
-    ]
-  }
-}
+
 async function roverADD() { 
         let app_name = await util.inputString("app_name", "", false, "App Name");
         await rover_utilities.samValidate(app_name["app_name"]);
@@ -188,7 +103,7 @@ async function listProfiles() {
   return profiles
 }
 async function run(argv: AnyObject) {
- //rover_utilities.generateSAM(testdata);
+ 
   try {
     if (rover_utilities.npmrootTest()) {
       const commandError = `rover ${argv.join(
@@ -208,8 +123,8 @@ async function run(argv: AnyObject) {
             let language = await util.languageChoice();
             
             template = await createModules(app_name, language)
-            console.log(JSON.stringify(template))
-             //await rover_utilities.generateSAM({ template }["template"]);
+          
+            await rover_utilities.generateSAM({ template }["template"]);
             
           } else if (editedSam === "add components to existing SAM") {
 
