@@ -14,8 +14,94 @@ let res: any = [];
 let resources: any = [];
 let stack_resource_Name: any = [];
 let AppType;
-let template = {};
+let template:AnyObject = {};
 let config;
+let testdata={
+  "app_name": "teststruct",
+  "language": "node",
+  "Stacks": {
+    "BaseModuleRlbao": "BaseModule",
+    "BaseModuleKogle": "BaseModule",
+    "EmailAuthModulePsaih": "EmailAuthModule",
+    "EmailAuthModuleWjzvl": "EmailAuthModule",
+    "RDSModuleLzxxx": "RDSModule",
+    "RDSModuleCnxwn": "RDSModule",
+    "CRUDModuleVuayw": "CRUDModule",
+    "CRUDModuleWwaex": "CRUDModule"
+  },
+  "StackParams": {
+    "BaseModuleRlbao": {},
+    "BaseModuleKogle": {},
+    "EmailAuthModulePsaih": {},
+    "EmailAuthModuleWjzvl": {},
+    "RDSModuleLzxxx": {},
+    "RDSModuleCnxwn": {},
+    "CRUDModuleVuayw": {
+      "Book": {
+        "path": "/book",
+        "methods": [
+          "put",
+          "get",
+          "post",
+          "delete",
+          "options"
+        ],
+        "resourcetype": "lambda"
+      },
+      "Author": {
+        "path": "/author",
+        "methods": [
+          "put",
+          "get",
+          "post",
+          "delete",
+          "options"
+        ],
+        "resourcetype": "lambda"
+      }
+    },
+    "CRUDModuleWwaex": {
+      "Book": {
+        "path": "/Book",
+        "methods": [
+          "put",
+          "get",
+          "post",
+          "delete",
+          "options"
+        ],
+        "resourcetype": "lambda"
+      },
+      "Author": {
+        "path": "/author",
+        "methods": [
+          "put",
+          "get",
+          "post",
+          "delete",
+          "options"
+        ],
+        "resourcetype": "lambda"
+      }
+    }
+  },
+  "CustomStacks": {
+    "custom": [
+      "S3 Lambda",
+      "CRUD API",
+      "S3 Bucket",
+      "Lambda",
+      "DynamoDB"
+    ],
+    "custo": [
+      "S3 Lambda",
+      "CRUD API",
+      "S3 Bucket",
+      "Lambda",
+      "DynamoDB"
+    ]
+  }
+}
 async function roverADD() { 
         let app_name = await util.inputString("app_name", "", false, "App Name");
         await rover_utilities.samValidate(app_name["app_name"]);
@@ -25,7 +111,7 @@ async function roverADD() {
         let CompStacks = await rover_utilities.checkNested(file_name);
         return { "appname": app_name, "language": language, "filename": file_name,"compstack":CompStacks }
 }
-async function CRUDObject(stackName,AppType) {
+async function CRUDObject(stackName:string,AppType:string) {
     let crud: AnyObject = {};
     let StackParams: AnyObject = {};
     let paramModule: AnyObject = {};
@@ -46,7 +132,7 @@ async function CRUDObject(stackName,AppType) {
     
     return StackParams
 } 
-async function CustomObject(i) { 
+async function CustomObject(i:number) { 
   let customStacks: any = {};
   let choice = cliConfig.customizable.components;
   let customstack_name = await util.inputString(`customStackName${i}`,"",false,`Stack ${i} Name: `);
@@ -54,29 +140,29 @@ async function CustomObject(i) {
   customStacks[customstack_name[`customStackName${i}`]] = CustomStacks.app_type;
   return customStacks
 } 
-async function createModules(app_name,language) {
+async function createModules(app_name:AnyObject,language:string) {
             let stack_names: any = {};
             let customStacks: any = {};
             let paramModule: AnyObject = {};
             let basecrud: AnyObject = {};
             let StackParams: any = {};
             let moreStack: any;
-            let stackname: object = {};
+            let stackname: AnyObject = {};
             let i = 1;
             let obj: AnyObject = {};
             do {
               let app_Types: any = [];
               let AppType: string = await util.appType("Module Type :");
-              if (AppType !== "Customizable") {
-                  stackname[`stackName${i}`] ="rover" + rover_utilities.makeid(5);
+              if (AppType !== "CustomizableModule") {
+                  stackname[`stackName${i}`] =AppType+rover_utilities.makeid(5);
                   let stack_name = stackname;
                   let stackName: string = stack_name[`stackName${i}`];
-                  if (AppType === "CRUD") {
+                  if (AppType === "CRUDModule") {
                     StackParams = { ...StackParams,... await CRUDObject(stackName,AppType)}; 
                   } else {
                     
                     obj[stackName] = basecrud;
-                    StackParams = { ...obj };
+                    StackParams = { ...obj ,...StackParams};
                   }
                   stack_names[stack_name[`stackName${i}`]] = AppType;
               } else {
@@ -96,7 +182,13 @@ async function createModules(app_name,language) {
               return template
   
 }
+async function listProfiles() {
+  let profiles = (exec("aws configure list-profiles").toString()).split("\n")
+  if (profiles[profiles.length - 1] == "") profiles.splice(profiles.length - 1, 1)
+  return profiles
+}
 async function run(argv: AnyObject) {
+ //rover_utilities.generateSAM(testdata);
   try {
     if (rover_utilities.npmrootTest()) {
       const commandError = `rover ${argv.join(
@@ -106,7 +198,7 @@ async function run(argv: AnyObject) {
         if (argv.length === 1 && argv[0] === "init") {
           let editedSam = await util.confirmation();
           if (editedSam === "create new SAM project") {
-            let app_name: object = await util.inputString(
+            let app_name: AnyObject = await util.inputString(
               "app_name",
               "",
               false,
@@ -115,8 +207,9 @@ async function run(argv: AnyObject) {
             await rover_utilities.checkFile(app_name["app_name"], "no");
             let language = await util.languageChoice();
             
-            template= await createModules(app_name,language)
-             await rover_utilities.generateSAM({ template }["template"]);
+            template = await createModules(app_name, language)
+            console.log(JSON.stringify(template))
+             //await rover_utilities.generateSAM({ template }["template"]);
             
           } else if (editedSam === "add components to existing SAM") {
 
@@ -184,20 +277,23 @@ async function run(argv: AnyObject) {
           if (r === "repository and pipeline") {
             console.log("Work in progress...");
           } else if (r === "generate pipeline") {
-            await rover_utilities.samValidate(undefined);
+            await rover_utilities.samValidate("");
             let lang: string = await rover_utilities.langValue();
             let pipeline = await util.samBuild(lang);
             let repoConfig = { ...pipeline };
             template = { ...template, repoConfig };
             let repoconfig = await Promise.resolve(util.jsonCreation(template));
             if (repoconfig !== undefined) {
+              
               await deployment.setupRepo(JSON.parse(repoconfig)["repoConfig"]);
+              rover_utilities.generateRoverConfig("",JSON.parse(repoconfig)["repoConfig"],"rover_generate_pipeline")
             }
           } else {
-            await rover_utilities.samValidate(undefined);
+            await rover_utilities.samValidate("");
             if (fs.existsSync("samconfig.toml")) {
               exec("rm -rf samconfig.toml");
             }
+            let profiles=await listProfiles()
             let filenamearray = exec("pwd").toString().split("/");
             let file_name = filenamearray[filenamearray.length - 1].replace(
               "\n",
@@ -216,6 +312,8 @@ async function run(argv: AnyObject) {
               "Bucket Name(optional) :"
             );
             let choice = buildConfig.samConfig.choices.deploymentregion;
+            let profile = (await util.inputType("AWS profile", profiles))["AWS profile"]
+            console.log(profile)
             let deploymentregion = await util.inputType(
               "Deployment region",
               choice
@@ -232,18 +330,14 @@ async function run(argv: AnyObject) {
             }
             let region = deploymentregion["Deployment region"];
 
-            exec(
-              "sh " +
-                rover_config.npmroot +
-                "/@rover-tools/cli/cli-main/exec.sh " +
-                file_name +
-                " " +
-                stack_name +
-                " " +
-                region +
-                " " +
-                bucketName
-            );
+            exec("sh " + rover_config.npmroot + "/@rover-tools/cli/cli-main/exec.sh " + file_name + " " + stack_name + " " + region + " " + bucketName + " "+profile);
+            
+            let configdata:AnyObject = {}
+            configdata["bucket"] = bucketName
+            configdata["stack name"] = stack_name
+            configdata["region"] = region
+            configdata["profile"] = profile
+            rover_utilities.generateRoverConfig("",configdata,"rover_deploy_cli")
           }
         } else if (argv[0] === "-v" || argv[0] === "--version") {
           // show current package version in the console
@@ -260,7 +354,7 @@ async function run(argv: AnyObject) {
       );
     }
   } catch (error) {
-    console.log("Error: ", error.message);
+    console.log("Error: ", error);
   }
 }
 export let stackNames: any = stack_resource_Name;

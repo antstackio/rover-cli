@@ -1,3 +1,4 @@
+import { AnyArray, AnyObject } from "immer/dist/internal";
 
 const rovercomponents = require("@rover-tools/engine").rover_components;
 const Stack = require("@rover-tools/engine").rover_modules;
@@ -13,13 +14,13 @@ export let LanguageSupport = {
     extension: ".py",
   },
 };
-let keys = []
-let values=[]
-  Stack.ModuleDescription.filter(ele => {
+let keys:AnyArray = []
+let values:AnyArray=[]
+  Stack.ModuleDescription.filter(function(ele:AnyObject) {
     keys.push(ele["key"])
      values.push(ele["value"])
    })
-export let app =
+export let app:AnyObject =
 {
   choices:{
     methods:["put","get","post","delete"],
