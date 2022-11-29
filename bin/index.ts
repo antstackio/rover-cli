@@ -175,7 +175,7 @@ async function run(argv: AnyObject) {
               
               i++;
             } while (moreStack !== "No" || choiceLength === 0);
-            await rover_utilities.addComponents(template);
+           await rover_utilities.addComponents(template);
           } else if (editedSam === "add modules to existing SAM") {
             let res = await roverADD()
             let app_name = res["appname"]
