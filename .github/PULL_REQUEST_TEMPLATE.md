@@ -1,8 +1,8 @@
 # Description
+
 Please include a summary of the changes and the related issue.
 
 ## Issue ticket number and link
-
 
 ## Type of change
 
@@ -16,4 +16,3 @@ Please delete options that are not relevant.
 ## New Packages
 
 1.
-
