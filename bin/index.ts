@@ -1,4 +1,4 @@
-import * as rover from   '@rover-tools/engine/dist/bin/index';
+import * as rover from "@rover-tools/engine/dist/bin/index"
 const rover_utilities = rover.rover_utilities
 const rover_config = rover.rover_config
 import * as fs from "fs"
@@ -11,10 +11,9 @@ import * as child from "child_process"
 const exec = child.execSync
 
 import { version } from "../package.json"
-import { AnyArray } from 'immer/dist/internal';
+import { AnyArray } from "immer/dist/internal"
 const stack_resource_Name: AnyArray = []
 let template: AnyObject = {}
-
 
 async function roverADD() {
   const app_name = await util.inputString("app_name", "", false, "App Name")
@@ -76,7 +75,6 @@ async function createModules(app_name: AnyObject, language: string) {
   let i = 1
   const obj: AnyObject = {}
   do {
-    
     const AppType: string = await util.appType("Module Type :")
     if (AppType !== "CustomizableModule") {
       stackname[`stackName${i}`] = AppType + rover_utilities.makeid(5)
@@ -150,7 +148,7 @@ async function run(argv: AnyObject) {
             const nestedComponents: AnyObject = {}
             const choice = Object.keys(CompStacks["CompStacks"])
             let choiceLength = 0
-            let i=0
+            let i = 0
             do {
               const nested = CompStacks["checkNested"]
               choiceLength = choice.length
@@ -195,7 +193,7 @@ async function run(argv: AnyObject) {
                 "Do you want to add one more components to modules ?"
               )
 
-              i=i+1
+              i = i + 1
             } while (moreStack !== "No" || choiceLength === 0)
             await rover_utilities.addComponents(template)
           } else if (editedSam === "add modules to existing SAM") {
@@ -219,7 +217,9 @@ async function run(argv: AnyObject) {
             const pipeline = await util.samBuild(lang)
             const repoConfig = { ...pipeline }
             template = { ...template, repoConfig }
-            const repoconfig = await Promise.resolve(util.jsonCreation(template))
+            const repoconfig = await Promise.resolve(
+              util.jsonCreation(template)
+            )
             if (repoconfig !== undefined) {
               await deployment.setupRepo(JSON.parse(repoconfig)["repoConfig"])
               rover_utilities.generateRoverConfig(
@@ -319,6 +319,5 @@ async function run(argv: AnyObject) {
 export const stackNames: AnyArray = stack_resource_Name
 let moreStack
 let customStacks: AnyObject
-
 
 run(process.argv.slice(2))

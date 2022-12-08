@@ -1,5 +1,5 @@
 import { AnyArray, AnyObject } from "immer/dist/internal"
-import * as rover from   '@rover-tools/engine/dist/bin/index';
+import * as rover from "@rover-tools/engine/dist/bin/index"
 const rovercomponents = rover.rover_components
 const Stack = rover.rover_modules
 export const LanguageSupport = {
@@ -16,7 +16,12 @@ export const LanguageSupport = {
 }
 const keys: AnyArray = []
 const values: AnyArray = []
-Stack.ModuleDescription.filter(function (ele: AnyObject) {
+export let moduleDescription: AnyArray = []
+Object.keys(Stack.Modules).forEach((element) => {
+  moduleDescription.push(Stack.Modules[element]["description"])
+})
+
+moduleDescription.filter(function (ele: AnyObject) {
   keys.push(ele["key"])
   values.push(ele["value"])
 })
@@ -25,7 +30,7 @@ export const app: AnyObject = {
     methods: ["put", "get", "post", "delete"],
     resourcetype: ["lambda", "stepfunction", "dynamodb"],
     language: ["Node", "Python"],
-    type: Object.values(Stack.ModuleDescription),
+    type: Object.values(moduleDescription),
     pipeline: ["generate pipeline", "cli", "repository and pipeline"],
   },
 }

@@ -1,18 +1,16 @@
-
 import * as inquirer from "inquirer"
 import * as cliConfig from "./cliConfig"
 import * as buildConfig from "./buildConfig"
 import { AnyArray, AnyObject } from "immer/dist/internal"
-import * as rover from '@rover-tools/engine/dist/bin/index';
+import * as rover from "@rover-tools/engine/dist/bin/index"
 
-const moduleParams = rover.rover_modules
+const moduleParams = rover.rover_modules.Modules
 const Stack = rover.rover_modules
 const envpattern = new RegExp(/^env\d\d+$/g)
 const apipathpattern = new RegExp(/^\/[a-zA-Z]*(\/[a-zA-Z]*-*)*/g)
 const stringpattern = new RegExp(/^[A-Za-z]+$/g)
 
 export const s3Choice: AnyArray = []
-
 
 export const multichoice = async function (name: string, choice: any) {
   const messages =
@@ -152,13 +150,7 @@ export const inputNumber = async function (userName: string, message: string) {
   return parseInt(takeInput[`${userName}`], 10)
 }
 
-export const validates = function (
-  value: any,
-  type: any,
-  min = "",
-  max = "",
-  
-) {
+export const validates = function (value: any, type: any, min = "", max = "") {
   if (type === "string") {
     if (typeof value !== "string" && min >= value.length && max <= value.length)
       return "Please enter valid text"
@@ -175,7 +167,7 @@ export const validates = function (
 export const inputCli = async function (
   obj: AnyObject,
   subObj: AnyArray,
-  choiceOption: string,
+  choiceOption: string
 ) {
   console.log(JSON.stringify(subObj))
   let res: AnyObject = {}
@@ -305,7 +297,7 @@ export const appType = async function (message = "") {
       choices: cliConfig.app.choices.type,
     },
   ])
-  const stackModule = Stack.ModuleDescription
+  const stackModule = cliConfig.moduleDescription
   for (const smodule of stackModule) {
     if (smodule.value === r["app_Type"]) {
       return smodule.key
@@ -329,7 +321,7 @@ export const params = async function (module: string) {
   let name: AnyObject = {}
   let res: AnyObject = {}
   if (module === "CRUDModule") {
-    const modulesParams = moduleParams.ModuleParams.CRUDModule.params
+    const modulesParams = moduleParams.CRUDModule["params"].params
     const paramslength = modulesParams.length
 
     if (paramslength > 0) {
