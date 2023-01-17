@@ -1,4 +1,7 @@
-export const samConfig = {
+export const samConfig: Record<
+  string,
+  Record<string, Array<string>> | Array<Record<string, string>>
+> = {
   choices: {
     tool: ["GitHub", "GitLab", "BitBucket"],
     language: ["js", "python"],

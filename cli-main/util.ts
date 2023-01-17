@@ -1,18 +1,21 @@
 import * as inquirer from "inquirer"
 import * as cliConfig from "./cliConfig"
 import * as buildConfig from "./buildConfig"
-import { AnyArray, AnyObject } from "immer/dist/internal"
 import * as rover from "@rover-tools/engine/dist/bin/index"
-
-const moduleParams = rover.rover_modules.Modules
-const Stack = rover.rover_modules
+import {
+  IroverDeploymentObject,
+  Iroverdescription,
+  IroverCLIparamModule,
+} from "../bin/rover.types"
+const moduleParams = rover.modules.Modules
 const envpattern = new RegExp(/^env\d\d+$/g)
 const apipathpattern = new RegExp(/^\/[a-zA-Z]*(\/[a-zA-Z]*-*)*/g)
 const stringpattern = new RegExp(/^[A-Za-z]+$/g)
 
-export const s3Choice: AnyArray = []
-
-export const multichoice = async function (name: string, choice: any) {
+export const multichoice = async function (
+  name: string,
+  choice: Array<string>
+) {
   const messages =
     "Please select your " + name.charAt(0).toUpperCase() + name.slice(1) + " :"
   const r = await inquirer.prompt([
@@ -33,7 +36,9 @@ export const multichoice = async function (name: string, choice: any) {
   return r
 }
 
-export const jsonCreation = async function (obj: AnyObject) {
+export const jsonCreation = async function (
+  obj: Record<string, IroverDeploymentObject>
+) {
   try {
     const content = JSON.stringify(obj, null, 2)
     return content
@@ -94,7 +99,7 @@ export const languageChoice = async function () {
 
 export const inputType = async function (
   userName: string,
-  choices: any,
+  choices: Array<string> | string,
   message = ""
 ) {
   const takeInput = await inquirer.prompt([
@@ -150,33 +155,26 @@ export const inputNumber = async function (userName: string, message: string) {
   return parseInt(takeInput[`${userName}`], 10)
 }
 
-export const validates = function (value: any, type: any, min = "", max = "") {
-  if (type === "string") {
-    if (typeof value !== "string" && min >= value.length && max <= value.length)
-      return "Please enter valid text"
-    else return true
-  } else if (type === "number") {
-    if (isNaN(value) && min >= value && max <= value) {
-      return "Please  enter valid number"
-    } else {
-      return true
-    }
-  }
-}
-
 export const inputCli = async function (
-  obj: AnyObject,
-  subObj: AnyArray,
+  obj: Record<
+    string,
+    Record<string, Array<string>> | Array<Record<string, string>>
+  >,
+  subObj: Array<Record<string, string>>,
   choiceOption: string
-) {
-  console.log(JSON.stringify(subObj))
-  let res: AnyObject = {}
+): Promise<Record<string, Record<string, string>>> {
+  let res: Record<string, Record<string, string>> = {}
   for (const sobj of subObj) {
     if (sobj.value === "object") {
-      const resp = await inputCli(obj, obj[sobj.key], choiceOption)
-      res = { ...res, [sobj.key]: resp }
+      const resp = await inputCli(
+        obj,
+        <Array<Record<string, string>>>(<unknown>obj[sobj.key]),
+        choiceOption
+      )
+      res = <Record<string, Record<string, string>>>{ ...res, [sobj.key]: resp }
     } else if (sobj.value === "choice") {
-      const choice = obj.choices[sobj.key]
+      const choices = <Record<string, Array<string>>>obj["choices"]
+      const choice = choices[sobj.key]
       const r = await inputType(sobj.key, choice, sobj.message)
       res[`${sobj.key}`] = r
     }
@@ -195,97 +193,114 @@ export const password = async function (userName: string, message = "") {
 }
 
 export const samBuild = async function (lang: string) {
-  const obj = buildConfig.samConfig
-  const subObj = buildConfig.samConfig.samBuild
-  let sam: AnyObject = await inputCli(obj, subObj, "")
-  const temp: AnyObject = {}
-  Object.values(sam).map((ele) => {
-    Object.assign(temp, ele)
-  })
-  sam = temp
-  sam["language"] = lang
-  const no_of_env = await inputNumber("no_of_env", "environments")
-  const envs: string[] = []
-  let steps: AnyObject = {}
-  let stacknames: AnyObject = {}
-  const deploymentregion: AnyObject = {}
-  let deploymentparameters: AnyObject = {}
-  let depBucketNames: AnyObject = {}
-  const branches = { branches: ["main"] }
-  for (let i = 1; i <= no_of_env; i++) {
-    const env = await inputString(`env${i}`, "", false, `Envrionment ${i} :`)
-    const envName = env[`env${i}`]
-    envs.push(envName)
-    const stepsChoice = buildConfig.samConfig.choices.dev
-    let step = await multichoice(
-      "steps required for " + `${envName}` + " environment ",
-      stepsChoice
+  try {
+    const obj = buildConfig.samConfig
+    const choices = <Record<string, Array<string>>>buildConfig.samConfig.choices
+    const subObj = <Array<Record<string, string>>>buildConfig.samConfig.samBuild
+    let sam: Record<string, Record<string, string>> = await inputCli(
+      obj,
+      subObj,
+      ""
     )
-    const steps1: AnyObject = {}
-    step = Object.keys(step).map((ele) => {
-      let name: string = ele.replace("steps required for ", "")
-      name = name.replace(" environment ", "")
-      steps1[name] = step[ele]
+    const temp: Record<string, Record<string, string>> = {}
+    Object.values(sam).map((ele) => {
+      Object.assign(temp, ele)
     })
+    sam = temp
+    const langs = { language: lang }
+    const no_of_env = await inputNumber("no_of_env", "environments")
+    const envs: string[] = []
+    let steps: Record<string, Array<string>> = {}
+    let stacknames: Record<string, string> = {}
+    const deploymentregion: Record<string, string> = {}
+    let deploymentparameters: Record<string, string> = {}
+    let depBucketNames: Record<string, string> = {}
 
-    const stackname = await inputString(
-      `${envName}`,
-      "",
-      true,
+    const branches = { branches: ["main"] }
+    for (let i = 1; i <= no_of_env; i++) {
+      const env = await inputString(`env${i}`, "", false, `Envrionment ${i} :`)
+      const envName = env[`env${i}`]
+      envs.push(envName)
 
-      `Stack Name(optional) --> ${envName} :`
-    )
-    const deploymentbucket = await inputString(
-      `${envName}`,
-      "",
-      true,
-      `Deployment Bucket(optional) --> ${envName} :`
-    )
-    const regionChoice = buildConfig.samConfig.choices.deploymentregion
-    const deployment_region = await inputType(
-      `${envName}`,
-      regionChoice,
-      "Deployment Region"
-    )
-    const deployment_parameter = await inputString(
-      `${envName}`,
-      "",
-      true,
-      `Deployment Parameter(optional) --> ${envName} :`
-    )
-    steps = { ...steps, ...steps1 }
-    stacknames = { ...stacknames, ...stackname }
-    depBucketNames = {
-      ...depBucketNames,
-      ...deploymentbucket,
+      const stepsChoice = choices.dev
+      let step = await multichoice(
+        "steps required for " + `${envName}` + " environment ",
+        stepsChoice
+      )
+      const steps1: Record<string, Array<string>> = {}
+      step = Object.keys(step).map((ele) => {
+        let name: string = ele.replace("steps required for ", "")
+        name = name.replace(" environment ", "")
+        steps1[name] = step[ele]
+      })
+
+      const stackname = await inputString(
+        `${envName}`,
+        "",
+        true,
+
+        `Stack Name(optional) --> ${envName} :`
+      )
+      const deploymentbucket = await inputString(
+        `${envName}`,
+        "",
+        true,
+        `Deployment Bucket(optional) --> ${envName} :`
+      )
+      const regionChoice = choices.deploymentregion
+      const deployment_region = await inputType(
+        `${envName}`,
+        regionChoice,
+        "Deployment Region"
+      )
+      const deployment_parameter = await inputString(
+        `${envName}`,
+        "",
+        true,
+        `Deployment Parameter(optional) --> ${envName} :`
+      )
+      steps = { ...steps, ...steps1 }
+
+      stacknames = { ...stacknames, ...stackname }
+
+      depBucketNames = {
+        ...depBucketNames,
+        ...deploymentbucket,
+      }
+      deploymentregion[`${envName}`] = deployment_region[`${envName}`]
+      deploymentparameters = {
+        ...deploymentparameters,
+        ...deployment_parameter,
+      }
     }
-    deploymentregion[`${envName}`] = deployment_region[`${envName}`]
-    deploymentparameters = { ...deploymentparameters, ...deployment_parameter }
-  }
-  const deployment_choice = buildConfig.samConfig.choices.deployment
-  const deploymentEvent = await multichoice(
-    `deployment events`,
-    deployment_choice
-  )
-  const framework = { framework: "sam" }
-  let result: AnyObject = {}
-  result = {
-    ...sam,
-    no_of_env,
-    envs,
-    ...branches,
-    ...framework,
-    steps,
-    stackname: { ...stacknames },
-    deploymentbucket: {
-      ...depBucketNames,
-    },
-    deploymentregion,
-    deploymentparameters,
-    ...deploymentEvent,
-  }
 
-  return result
+    const deployment_choice = choices.deployment
+    const deploymentEvent = await multichoice(
+      `deploymentevents`,
+      deployment_choice
+    )
+    const framework = { framework: "sam" }
+    let result: IroverDeploymentObject = <IroverDeploymentObject>{}
+    result = {
+      ...sam,
+      ...langs,
+      no_of_env,
+      envs,
+      ...branches,
+      ...framework,
+      steps,
+      stackname: { ...stacknames },
+      deploymentbucket: {
+        ...depBucketNames,
+      },
+      deploymentregion,
+      deploymentparameters,
+      ...deploymentEvent,
+    }
+    return result
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 export const appType = async function (message = "") {
@@ -317,9 +332,10 @@ export const moreStack = async function (message: string) {
 }
 
 export const params = async function (module: string) {
-  const choice: AnyObject = cliConfig.app.choices
-  let name: AnyObject = {}
-  let res: AnyObject = {}
+  const choice: Record<string, Array<string> | Array<Iroverdescription>> =
+    cliConfig.app.choices
+  let name: Record<string,string> = {}
+  let res: IroverCLIparamModule = <IroverCLIparamModule>{}
   if (module === "CRUDModule") {
     const modulesParams = moduleParams.CRUDModule["params"].params
     const paramslength = modulesParams.length
@@ -329,13 +345,16 @@ export const params = async function (module: string) {
         if (modulesParams[i].value === "choice") {
           const r = await inputType(
             modulesParams[i].key,
-            choice[modulesParams[i].key],
+            <Array<string>>choice[modulesParams[i].key],
             modulesParams[i].message
           )
 
           res = { ...res, ...r }
         } else if (modulesParams[i].value === "multichoice") {
-          const r = await multichoice(modulesParams[i].key, choice.methods)
+          const r = await multichoice(
+            modulesParams[i].key,
+            <Array<string>>choice.methods
+          )
           res = { ...res, ...r }
         } else {
           if (modulesParams[i].key === "name") {

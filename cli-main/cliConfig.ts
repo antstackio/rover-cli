@@ -1,7 +1,8 @@
-import { AnyArray, AnyObject } from "immer/dist/internal"
+import { Iroverdescription } from "../bin/rover.types"
 import * as rover from "@rover-tools/engine/dist/bin/index"
-const rovercomponents = rover.rover_components
-const Stack = rover.rover_modules
+const rovercomponents = rover.components
+const Stack = rover.modules
+
 export const LanguageSupport = {
   node: {
     version: "nodejs14.x",
@@ -14,18 +15,22 @@ export const LanguageSupport = {
     extension: ".py",
   },
 }
-const keys: AnyArray = []
-const values: AnyArray = []
-export let moduleDescription: AnyArray = []
+const keys: Array<string> = []
+const values: Array<string> = []
+export const moduleDescription: Array<Iroverdescription> = []
 Object.keys(Stack.Modules).forEach((element) => {
   moduleDescription.push(Stack.Modules[element]["description"])
 })
 
-moduleDescription.filter(function (ele: AnyObject) {
+moduleDescription.filter(function (ele: Iroverdescription) {
   keys.push(ele["key"])
   values.push(ele["value"])
 })
-export const app: AnyObject = {
+
+export const app: Record<
+  string,
+  Record<string, Array<string> | Array<Iroverdescription>>
+> = {
   choices: {
     methods: ["put", "get", "post", "delete"],
     resourcetype: ["lambda", "stepfunction", "dynamodb"],
