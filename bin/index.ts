@@ -4,10 +4,10 @@ const rover_generateSAM = rover.generateSAM
 const rover_addComponent = rover.addComponents
 const rover_addModules = rover.addModules
 import * as fs from "fs"
-import * as cliConfig from "../cli-main/cliConfig"
-import * as util from "../cli-main/util"
+import * as cliConfig from "../src/cliConfig"
+import * as util from "../src/util"
 const deployment = rover.deployment
-import * as buildConfig from "../cli-main/buildConfig"
+import * as buildConfig from "../src/buildConfig"
 
 import {
   IroverInput,
@@ -22,20 +22,17 @@ import {
   TnestedComponentsObject,
   IroverDeploymentConfig,
   IroverDeploymentObject,
-} from "./rover.types"
+} from "../src/rover.types"
 import * as child from "child_process"
 const exec = child.execSync
 
 import { version } from "../package.json"
-
 async function roverADD() {
   const app_name = await util.inputString("app_name", "", false, "App Name")
   await rover_helpers.samValidate(app_name["app_name"])
   await rover_helpers.checkFile(app_name["app_name"], "yes")
   const language = await util.languageChoice()
-  const file_name = await exec(
-    `ls " + ${app_name["app_name"]}/*.yaml `
-  ).toString()
+  const file_name = await exec(`ls ${app_name["app_name"]}/*.yaml `).toString()
   const CompStacks = await rover_helpers.checkNested(file_name)
   return {
     appname: app_name,
@@ -93,7 +90,7 @@ async function createModules(
   do {
     const AppType: string = <string>await util.appType("Module Type :")
     if (AppType !== "CustomizableModule") {
-      stackname[`stackName${i}`] = AppType + rover_helpers.makeid(5)
+      stackname[`stackName${i}`] = `${AppType}  ${rover_helpers.makeid(5)}`
       const stack_name = stackname
       const stackName: string = stack_name[`stackName${i}`]
       if (AppType === "CRUDModule") {
@@ -179,7 +176,7 @@ async function run(argv: Array<string>) {
             await rover_helpers.checkFile(app_name["app_name"], "yes")
             const language = await util.languageChoice()
             const file_name = await exec(
-              "ls " + app_name["app_name"] + "/" + "*.yaml "
+              `ls ${app_name["app_name"]}/*.yaml `
             ).toString()
             const CompStacks = await rover_helpers.checkNested(file_name)
             const nestedComponents: TnestedComponentsObject = <
@@ -316,18 +313,18 @@ async function run(argv: Array<string>) {
             if (bucketName["name"] == "") {
               bucketName = " --resolve-s3 "
             } else {
-              bucketName = " --s3-bucket " + bucketName["name"]
+              bucketName = ` --s3-bucket ${bucketName["name"]}`
             }
             if (stack_name["stack_name"] == "") {
-              stack_name = file_name + "roverTest"
+              stack_name = `${file_name} roverTest`
             } else {
               stack_name = stack_name["stack_name"]
             }
             const region = deploymentregion["Deployment region"]
 
-            // exec(
-            //   `sh ${rover_helpers.npmroot}/@rover-tools/cli/cli-main/exec.sh ${file_name} ${stack_name} ${region} ${bucketName} ${profile} `
-            // )
+            exec(
+              `sh ${rover_helpers.npmroot}/@rover-tools/cli/cli-main/exec.sh ${file_name} ${stack_name} ${region} ${bucketName} ${profile} `
+            )
 
             const configdata: IroverDeploymentConfig = <
               IroverDeploymentConfig
