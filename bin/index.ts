@@ -19,7 +19,12 @@ import {
 } from "../src/rover.types"
 import * as child from "child_process"
 const exec = child.execSync
-
+const test = {
+  app_name: "dgbcom",
+  language: "node",
+  file_name: "dgbcom/template.yaml\n",
+  components: ["S3 Lambda", "CRUD API", "S3 Bucket", "Lambda", "DynamoDB"],
+}
 import { version } from "../package.json"
 
 async function run(argv: Array<string>) {
@@ -43,7 +48,8 @@ async function run(argv: Array<string>) {
 
             const template: IroverInput = await createModules(
               app_name,
-              language
+              language,
+              ""
             )
             await rover_generateSAM.generateSAM(
               <IroverInput>{ template }["template"]
@@ -82,17 +88,15 @@ async function run(argv: Array<string>) {
                 const componentChoice = cliConfig.customizable.components
                 const components = await util.multichoice(
                   "components",
-                  componentChoice
+                  componentChoice,
+                  ""
                 )
                 const path = CompStacks["compStacks"][selectedchoice[0]]
                 nestedComponents[selectedchoice[0]] = {
                   ...components,
                   path: path,
                 }
-                console.log(
-                  "nestedComponents",
-                  JSON.stringify(nestedComponents)
-                )
+
                 template = {
                   ...app_name,
                   language,
@@ -102,8 +106,9 @@ async function run(argv: Array<string>) {
                 }
               } else {
                 const choice = cliConfig.customizable.components
+                choiceLength = 0
                 const Compnents = <Array<string>>(
-                  await util.multichoice("components", choice)
+                  await util.multichoice("components", choice, "")
                 )
                 template = { ...app_name, language }
                 if (customStacks !== null)
@@ -117,27 +122,75 @@ async function run(argv: Array<string>) {
               moreStack = await util.moreStack(
                 "Do you want to add one more components to modules ?"
               )
-
+              console.log(moreStack)
               i = i + 1
-            } while (moreStack !== "No" || choiceLength === 0)
+            } while (moreStack !== "No" && choiceLength === 0)
+            console.log(JSON.stringify(template))
             await rover_addComponent.addComponents(
               <IroveraddComponentInput>template
             )
           } else if (editedSam === "add modules to existing SAM") {
             const res = await roverADD()
+            let template: IroveraddModule = <IroveraddModule>{}
             const app_name = res["appname"]
             const language = res["language"]
             const file_name = res["filename"]
-            const addToExisting = await util.inputString(
+            const addToExisting = await util.multichoice(
               "addToExisting",
-              "",
-              false,
-              "Add to Existing Module: "
+              ["Yes", "No"],
+              "Do you want to Add a module to existing Module :"
             )
-            console.log(addToExisting)
-            const template = <IroveraddModule>(
-              await createModules(app_name, language)
-            )
+            if (addToExisting.addToExisting[0] == "Yes") {
+              const CompStacks = await rover_helpers.checkNested(file_name)
+              const choice = Object.keys(CompStacks["compStacks"])
+              let choiceLength = 0
+              let i = 0
+              do {
+                const nested = CompStacks["checkNested"]
+                choiceLength = choice.length
+                if (nested) {
+                  const chooseStack = await util.inputType(
+                    "Select the stack to which you want to add the module ",
+                    choice
+                  )
+                  const selectedchoice = choice.filter((ele) =>
+                    Object.values(chooseStack).includes(ele)
+                  )
+                  const samResources = rover_helpers.listSAMResources(
+                    file_name,
+                    selectedchoice[0]
+                  )
+                  template = <IroveraddModule>(
+                    await createModules(app_name, language, "")
+                  )
+                  Object.keys(template.stackDetails).forEach((ele) => {
+                    template.stackDetails[ele].stackName = selectedchoice[0]
+                  })
+                } else {
+                  const choice = cliConfig.customizable.components
+                  const Compnents = <Array<string>>(
+                    await util.multichoice("components", choice, "")
+                  )
+                  template = { ...app_name, language }
+                  if (customStacks !== null)
+                    template = {
+                      ...template,
+                      file_name,
+                      ...Compnents,
+                    }
+                }
+
+                moreStack = await util.moreStack(
+                  "Do you want to add one more modules ?"
+                )
+
+                i = i + 1
+              } while (moreStack !== "No" || choiceLength === 0)
+            } else {
+              template = <IroveraddModule>(
+                await createModules(app_name, language, "")
+              )
+            }
             template["file_name"] = file_name
             await rover_addModules.addModules(<IroveraddModule>template)
           }

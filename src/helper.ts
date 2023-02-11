@@ -57,13 +57,14 @@ async function CustomObject(i: number) {
     false,
     `Stack ${i} Name: `
   )
-  const CustomStacks = await util.multichoice("app_type", choice)
+  const CustomStacks = await util.multichoice("app_type", choice, "")
   customStacks[customstack_name[`customStackName${i}`]] = CustomStacks.app_type
   return customStacks
 }
 export async function createModules(
   app_name: Record<string, string>,
-  language: string
+  language: string,
+  stackName: string
 ) {
   const stack_names: Record<string, string> = {}
   let customStacks: Record<string, Array<string>> = {}
@@ -77,7 +78,7 @@ export async function createModules(
   do {
     const AppType: string = <string>await util.appType("Module Type :")
     if (AppType !== "CustomizableModule") {
-      stackname[`stackName${i}`] = `${AppType}  ${rover_helpers.makeid(5)}`
+      stackname[`stackName${i}`] = `${AppType}${rover_helpers.makeid(5)}`
       const stack_name = stackname
       const stackName: string = stack_name[`stackName${i}`]
       if (AppType === "CRUDModule") {
@@ -101,7 +102,7 @@ export async function createModules(
       stackDetails[element] = <IstackDetailsObject>{}
       stackDetails[element]["type"] = stack_names[element]
       stackDetails[element]["params"] = StackParams[element]
-      stackDetails[element]["componentlist"] = []
+      stackDetails[element]["componentList"] = []
     })
   }
   if (customStacks !== null) {
@@ -109,13 +110,13 @@ export async function createModules(
       stackDetails[element] = <IstackDetailsObject>{}
       stackDetails[element]["type"] = "Custom"
       stackDetails[element]["params"] = {}
-      stackDetails[element]["componentlist"] = customStacks[element]
+      stackDetails[element]["componentList"] = customStacks[element]
     })
   }
   const template: IroverInput = {
     app_name: app_name["app_name"],
     language,
-    stack_details: stackDetails,
+    stackDetails: stackDetails,
   }
   return template
 }

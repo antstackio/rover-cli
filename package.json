@@ -34,7 +34,7 @@
     "start": "tsc   bin/init.ts && tsc  bin/index.ts && npm install -g . ",
     "build": "tsc && npm run format:write && npm run lint:fix",
     "watch": "tsc --watch",
-    "localtest": "npm install /Users/dheerajbhatt/proj/rover-engine && npm run build && npm install /Users/dheerajbhatt/proj/rover-cli -g  ",
+    "localtest": "npm install rover-engine && npm run build && npm install rover-cli -g  ",
     "prepack": "npm run clean && npm run build ",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",

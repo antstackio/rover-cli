@@ -14,11 +14,18 @@ const stringpattern = new RegExp(/^[A-Za-z]+$/g)
 
 export const multichoice = async function (
   name: string,
-  choice: Array<string>
+  choice: Array<string>,
+  message: string
 ) {
-  const messages = `Please select your  ${name
-    .charAt(0)
-    .toUpperCase()} ${name.slice(1)}  :`
+  let messages = ""
+  if (message == "") {
+    messages = `Please select your  ${name
+      .charAt(0)
+      .toUpperCase()} ${name.slice(1)}  :`
+  } else {
+    messages = message
+  }
+
   const r = await inquirer.prompt([
     {
       type: "checkbox",
@@ -225,8 +232,9 @@ export const samBuild = async function (lang: string) {
 
       const stepsChoice = choices.dev
       let step = await multichoice(
-        `steps required for ${envName}  environment `,
-        stepsChoice
+        `steps required for ${envName} environment `,
+        stepsChoice,
+        ""
       )
       const steps1: Record<string, Array<string>> = {}
       step = Object.keys(step).map((ele) => {
@@ -278,7 +286,8 @@ export const samBuild = async function (lang: string) {
     const deployment_choice = choices.deployment
     const deploymentEvent = await multichoice(
       `deploymentevents`,
-      deployment_choice
+      deployment_choice,
+      ""
     )
     const framework = { framework: "sam" }
     let result: IroverDeploymentObject = <IroverDeploymentObject>{}
@@ -354,7 +363,8 @@ export const params = async function (module: string) {
         } else if (modulesParams[i].value === "multichoice") {
           const r = await multichoice(
             modulesParams[i].key,
-            <Array<string>>choice.methods
+            <Array<string>>choice.methods,
+            ""
           )
           res = { ...res, ...r }
         } else {

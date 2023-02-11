@@ -8,7 +8,8 @@ interface curdObject {
 export interface IstackDetailsObject {
   type: string
   params: curdObject | object
-  componentlist: Array<string>
+  componentList: Array<string>
+  stackName: string
 }
 export interface IstackDetails {
   [key: string]: IstackDetailsObject
@@ -16,10 +17,10 @@ export interface IstackDetails {
 export interface IroverInput {
   app_name: string
   language: string
-  stack_details: IstackDetails
+  stackDetails: IstackDetails
 }
 
-export interface IroverAppData extends Omit<IroverInput, "stack_details"> {
+export interface IroverAppData extends Omit<IroverInput, "stackDetails"> {
   dependency: string
   extension: string
   StackType: Array<string>
@@ -34,13 +35,13 @@ export interface IroverConfigTagArrayValue {
   Value: string
 }
 export interface IroveraddComponentInputNestedType
-  extends Omit<IroverInput, "stack_details"> {
+  extends Omit<IroverInput, "stackDetails"> {
   nested: boolean
   file_name: string
   nestedComponents: nestedComponentsObject
 }
 export interface IroveraddComponentInputType
-  extends Omit<IroverInput, "stack_details"> {
+  extends Omit<IroverInput, "stackDetails"> {
   nested: boolean
   file_name: string
   components: Array<string>
