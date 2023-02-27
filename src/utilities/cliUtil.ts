@@ -1,12 +1,12 @@
 import * as inquirer from "inquirer"
-import * as cliConfig from "./cliConfig"
-import * as buildConfig from "./buildConfig"
+import * as cliConfig from "../configs/cliConfig"
+import * as buildConfig from "../configs/buildConfig"
 import * as rover from "@rover-tools/engine/dist/bin/index"
 import {
   IroverDeploymentObject,
   Iroverdescription,
   IroverCLIparamModule,
-} from "./rover.types"
+} from "../rover.types"
 const moduleParams = rover.modules.Modules
 const envpattern = new RegExp(/^env\d\d+$/g)
 const apipathpattern = new RegExp(/^\/[a-zA-Z]*(\/[a-zA-Z]*-*)*/g)

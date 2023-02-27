@@ -7,12 +7,12 @@ import {
   IstackDetails,
   IstackDetailsObject,
   IroverCLIcurdObject,
-} from "../src/rover.types"
+} from "../rover.types"
 import * as child from "child_process"
-import * as cliConfig from "../src/cliConfig"
+import * as cliConfig from "../configs/cliConfig"
 const exec = child.execSync
 const rover_helpers = rover.helpers
-import * as util from "../src/util"
+import * as util from "./cliUtil"
 let moreStack
 export async function roverADD() {
   const app_name = await util.inputString("app_name", "", false, "App Name:")
@@ -78,7 +78,7 @@ export async function createModules(
   do {
     const AppType: string = <string>await util.appType("Module Type :")
     if (AppType !== "CustomizableModule") {
-      stackname[`stackName${i}`] = `${AppType}${rover_helpers.makeid(5)}`
+      stackname[`stackName${i}`] = `${AppType}${rover_helpers.makeId(5)}`
       const stack_name = stackname
       const stackName: string = stack_name[`stackName${i}`]
       if (AppType === "CRUDModule") {

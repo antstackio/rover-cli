@@ -1,8 +1,12 @@
-import { Iroverdescription } from "./rover.types"
+import { Iroverdescription } from "../rover.types"
 import * as rover from "@rover-tools/engine/dist/bin/index"
 const rovercomponents = rover.components
 const Stack = rover.modules
-
+export const commandError = (argv: Array<string>) => {
+  return `rover ${argv.join(
+    " "
+  )} -is not a rover command \n  rover init   - creates new SAM project \n  rover deploy - deploys SAM project\n rover -v or rover --version - gives installed rover version`
+}
 export const LanguageSupport = {
   node: {
     version: "nodejs14.x",
