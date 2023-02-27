@@ -1,5 +1,4 @@
 type TcrudMethods = "put" | "get" | "post" | "delete" | "options"
-//type TroverLang = "node" | "python";
 interface curdObject {
   path: string
   methods: Array<TcrudMethods>

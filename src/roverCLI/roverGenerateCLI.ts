@@ -28,7 +28,7 @@ export async function createSAMCLI(): Promise<void> {
   const language = await util.languageChoice()
 
   const template: IroverInput = await createModules(app_name, language, "")
-  await rover_generateSAM.generateSAM(<IroverInput>{ template }["template"])
+  await rover_generateSAM.generateSAM({ template }["template"])
 }
 export async function addComponentCLI() {
   const app_name = await util.inputString("app_name", "", false, "App Name")
@@ -39,11 +39,9 @@ export async function addComponentCLI() {
   const CompStacks = await rover_helpers.checkNested(file_name)
   const nestedComponents: TnestedComponentsObject = <TnestedComponentsObject>{}
   const choice = Object.keys(CompStacks["compStacks"])
-  let choiceLength = 0
   let i = 0
   do {
     const nested = CompStacks["checkNested"]
-    choiceLength = choice.length
     if (nested) {
       const chooseStack = await util.inputType(
         "Select the module to which you want to add the components ",
@@ -73,7 +71,6 @@ export async function addComponentCLI() {
       }
     } else {
       const choice = cliConfig.customizable.components
-      choiceLength = 0
       const Compnents = <Array<string>>(
         await util.multichoice("components", choice, "")
       )
