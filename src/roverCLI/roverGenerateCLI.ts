@@ -88,7 +88,7 @@ export async function addComponentCLI() {
     i = i + 1
   } while (moreStack !== "No")
   console.log(JSON.stringify(template))
-  await rover_addComponent.addComponents(<IroveraddComponentInput>template)
+  await rover_addComponent.addComponents(template)
 }
 export async function addModuleCLI() {
   const res = await roverADD()
@@ -119,6 +119,7 @@ export async function addModuleCLI() {
           file_name,
           selectedchoice[0]
         )
+        console.log(samResources)
         const moduletemplate = <IroveraddModule>(
           await createModules(app_name, language, "")
         )
@@ -158,5 +159,5 @@ export async function addModuleCLI() {
   }
   template["file_name"] = file_name
   console.log(JSON.stringify(template))
-  await rover_addModules.addModules(<IroveraddModule>template)
+  await rover_addModules.addModules(template)
 }

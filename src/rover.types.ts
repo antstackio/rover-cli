@@ -1,12 +1,12 @@
 type TcrudMethods = "put" | "get" | "post" | "delete" | "options"
-interface curdObject {
+interface IcurdObject {
   path: string
   methods: Array<TcrudMethods>
   resourcetype: string
 }
 export interface IstackDetailsObject {
   type: string
-  params: curdObject | object
+  params: IcurdObject | object
   componentList: Array<string>
   stackName: string
 }
