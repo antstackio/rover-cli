@@ -26,11 +26,12 @@ Object.keys(Stack.Modules).forEach((element) => {
   moduleDescription.push(Stack.Modules[element]["description"])
 })
 
-moduleDescription.filter(function (ele: Iroverdescription) {
+export const moduleDescriptions = moduleDescription.filter(function (
+  ele: Iroverdescription
+) {
   keys.push(ele["key"])
   values.push(ele["value"])
 })
-
 export const app: Record<
   string,
   Record<string, Array<string> | Array<Iroverdescription>>
