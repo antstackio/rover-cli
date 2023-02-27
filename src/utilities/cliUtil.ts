@@ -290,8 +290,8 @@ export const samBuild = async function (lang: string) {
       ""
     )
     const framework = { framework: "sam" }
-    let result: IroverDeploymentObject = <IroverDeploymentObject>{}
-    result = {
+
+     let result: IroverDeploymentObject = {
       ...sam,
       ...langs,
       no_of_env,
