@@ -27,7 +27,7 @@ export async function createSAMCLI(): Promise<void> {
   await rover_helpers.checkFile(app_name["app_name"], "no")
   const language = await util.languageChoice()
 
-  const template: IroverInput = await createModules(app_name, language, "")
+  const template: IroverInput = await createModules(app_name, language)
   await rover_generateSAM.generateSAM({ template }["template"])
 }
 export async function addComponentCLI() {
@@ -121,7 +121,7 @@ export async function addModuleCLI() {
         )
         console.log(samResources)
         const moduletemplate = <IroveraddModule>(
-          await createModules(app_name, language, "")
+          await createModules(app_name, language)
         )
         if (Object.keys(template).length == 0) {
           template = moduletemplate
@@ -155,7 +155,7 @@ export async function addModuleCLI() {
       i = i + 1
     } while (moreStack !== "No")
   } else {
-    template = <IroveraddModule>await createModules(app_name, language, "")
+    template = <IroveraddModule>await createModules(app_name, language)
   }
   template["file_name"] = file_name
   console.log(JSON.stringify(template))

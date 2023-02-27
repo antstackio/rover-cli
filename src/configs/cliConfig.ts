@@ -2,6 +2,8 @@ import { Iroverdescription } from "../rover.types"
 import * as rover from "@rover-tools/engine/dist/bin/index"
 const rovercomponents = rover.components
 const Stack = rover.modules
+export const globalError =
+  "Note: install @rover-tools/cli globally (install @rover-tools/cli -g)"
 export const commandError = (argv: Array<string>) => {
   return `rover ${argv.join(
     " "

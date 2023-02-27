@@ -63,8 +63,7 @@ async function CustomObject(i: number) {
 }
 export async function createModules(
   app_name: Record<string, string>,
-  language: string,
-  stackName: string
+  language: string
 ) {
   const stack_names: Record<string, string> = {}
   let customStacks: Record<string, Array<string>> = {}
