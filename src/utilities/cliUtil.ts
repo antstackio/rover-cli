@@ -80,13 +80,11 @@ export const inputString = async function (
             else message = `${messages} should have only alphanumeric values`
           }
         }
-
         if (message !== "") return message
         else return true
       },
     },
   ])
-
   return { ...takeInput }
 }
 

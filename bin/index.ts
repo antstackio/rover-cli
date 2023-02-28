@@ -14,7 +14,7 @@ import { version } from "../package.json"
 
 async function run(argv: Array<string>): Promise<void> {
   try {
-    if (rover_helpers.npmrootTest()) {
+    if (!rover_helpers.npmrootTest()) {
       throw new Error(cliConfig.globalError)
     }
     const commandErrors = cliConfig.commandError(argv)

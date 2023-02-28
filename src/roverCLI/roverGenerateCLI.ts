@@ -90,7 +90,7 @@ export async function addComponentCLI() {
   console.log(JSON.stringify(template))
   await rover_addComponent.addComponents(template)
 }
-export async function addModuleCLI() {
+export async function addModuleCLI(): Promise<void> {
   const res = await roverADD()
   let template: IroveraddModule = <IroveraddModule>{}
   const app_name = res["appname"]
