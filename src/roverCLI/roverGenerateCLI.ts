@@ -156,8 +156,8 @@ export async function addModuleCLI(): Promise<void> {
     } while (moreStack !== "No")
   } else {
     template = <IroveraddModule>await createModules(app_name, language)
+    template["file_name"] = file_name
+   await rover_addModules.addModules(template)
   }
-  template["file_name"] = file_name
-  console.log(JSON.stringify(template))
-  await rover_addModules.addModules(template)
+  
 }
