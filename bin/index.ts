@@ -39,7 +39,8 @@ async function run(argv: Array<string>): Promise<void> {
       console.log(commandErrors)
     }
   } catch (error) {
-    console.log("Error: ", (error as Error).message)
+    console.log("Error: ", error as Error)
+    //.message)
   }
 }
 run(process.argv.slice(2))

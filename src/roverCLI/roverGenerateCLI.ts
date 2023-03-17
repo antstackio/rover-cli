@@ -3,6 +3,7 @@ const rover_helpers = rover.helpers
 const rover_addComponent = rover.addComponents
 const rover_addModules = rover.addModules
 const rover_generateSAM = rover.generateSAM
+const rover_addModulesToexisting = rover.addModulesToExisting
 import * as util from "../utilities/cliUtil"
 import * as cliConfig from "../configs/cliConfig"
 import { createModules, roverADD } from "../utilities/helper"
@@ -87,7 +88,6 @@ export async function addComponentCLI() {
     )
     i = i + 1
   } while (moreStack !== "No")
-  console.log(JSON.stringify(template))
   await rover_addComponent.addComponents(template)
 }
 export async function addModuleCLI(): Promise<void> {
@@ -123,6 +123,9 @@ export async function addModuleCLI(): Promise<void> {
         const moduletemplate = <IroveraddModule>(
           await createModules(app_name, language)
         )
+        Object.keys(moduletemplate.stackDetails).forEach((ele) => {
+          moduletemplate.stackDetails[ele].stackName = selectedchoice[0]
+        })
         if (Object.keys(template).length == 0) {
           template = moduletemplate
         } else {
@@ -131,9 +134,6 @@ export async function addModuleCLI(): Promise<void> {
             ...moduletemplate.stackDetails,
           }
         }
-        Object.keys(template.stackDetails).forEach((ele) => {
-          template.stackDetails[ele].stackName = selectedchoice[0]
-        })
       } else {
         const choice = cliConfig.customizable.components
         const Compnents = <Array<string>>(
@@ -143,21 +143,21 @@ export async function addModuleCLI(): Promise<void> {
         if (customStacks !== null)
           template = {
             ...template,
-            file_name,
             ...Compnents,
           }
       }
-
       moreStack = await util.moreStack(
-        "Do you want to add one more modules to this stack ?"
+        "Do you want to add one more modules to another stack ?"
       )
-
       i = i + 1
     } while (moreStack !== "No")
+    template["file_name"] = file_name
+    console.log("template", JSON.stringify(template))
+    await rover_addModulesToexisting.addModulesToExistingStack(template)
   } else {
     template = <IroveraddModule>await createModules(app_name, language)
-    template["file_name"] = file_name
-   await rover_addModules.addModules(template)
+
+    console.log("template", JSON.stringify(template))
+    await rover_addModules.addModules(template)
   }
-  
 }

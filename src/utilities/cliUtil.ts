@@ -20,9 +20,9 @@ export const multichoice = async function (
 ) {
   let messages = ""
   if (message == "") {
-    messages = `Please select your  ${name
-      .charAt(0)
-      .toUpperCase()} ${name.slice(1)}  :`
+    messages = `Please select your  ${name.charAt(0).toUpperCase()}${name.slice(
+      1
+    )}  :`
   } else {
     messages = message
   }
