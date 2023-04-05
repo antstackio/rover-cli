@@ -56,7 +56,7 @@ export const jsonCreation = async function (
   }
 }
 
-export const inputString = async function (
+export const inputStrings = async function (
   userName: string,
   defaults: string,
   optional: boolean,
@@ -88,6 +88,31 @@ export const inputString = async function (
   ])
   return { ...takeInput }
 }
+
+export async function inputString(
+  name: string,
+  defaults: string,
+  optional: boolean,
+  message = ""
+) {
+  const takeInput = await inquirer.prompt({
+    type: "input",
+    name,
+    message,
+    validate: (value) => {
+      if (name === "path") {
+        return apipathpattern.test(value) || "Please enter a valid path";
+      } else if (envpattern.test(name)) {
+        return (value !== "" && value !== undefined) || "Environment values cannot be empty";
+      } else {
+        return optional || stringpattern.test(value) || `${message} should have only alphanumeric values`;
+      }
+    },
+  });
+
+  return { ...takeInput };
+}
+
 
 export const languageChoice = async function () {
   const lang = await inquirer.prompt([
