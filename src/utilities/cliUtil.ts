@@ -328,7 +328,7 @@ export const appType = async function (message = "") {
     }
   }
 }
-export const moreStack = async function (message: string) {
+export const choicesYorN = async function (message: string) {
   const r = await inquirer.prompt([
     {
       type: "list",

@@ -14,7 +14,7 @@ export interface IstackDetails {
   [key: string]: IstackDetailsObject
 }
 export interface IroverInput {
-  app_name: string
+  appName: string
   language: string
   stackDetails: IstackDetails
 }
@@ -36,13 +36,13 @@ export interface IroverConfigTagArrayValue {
 export interface IroveraddComponentInputNestedType
   extends Omit<IroverInput, "stackDetails"> {
   nested: boolean
-  file_name: string
+  fileName: string
   nestedComponents: nestedComponentsObject
 }
 export interface IroveraddComponentInputType
   extends Omit<IroverInput, "stackDetails"> {
   nested: boolean
-  file_name: string
+  fileName: string
   components: Array<string>
 }
 
@@ -58,7 +58,7 @@ interface IroverComponentInputObject {
 type nestedComponentsObject = Record<string, IroverComponentInputObject>
 
 export interface IroveraddModule extends IroverInput {
-  file_name: string
+  fileName: string
 }
 
 export interface IroverCLIcurdObject {
@@ -95,7 +95,7 @@ export interface Iroverdescription {
   value: string
 }
 export interface IroverDeploymentObject {
-  app_name?: string
+  appName?: string
   name?: string
   repoType: string
   tool: string

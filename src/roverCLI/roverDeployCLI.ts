@@ -36,7 +36,7 @@ export async function deployCLI() {
     }
     const profiles = await listProfiles()
     const filenamearray = exec("pwd").toString().split("/")
-    const file_name = filenamearray[filenamearray.length - 1].replace("\n", "")
+    const fileName = filenamearray[filenamearray.length - 1].replace("\n", "")
     let stack_name = await util.inputString(
       "stack_name",
       "",
@@ -63,14 +63,14 @@ export async function deployCLI() {
       bucketName = ` --s3-bucket ${bucketName["name"]}`
     }
     if (stack_name["stack_name"] == "") {
-      stack_name = `${file_name} roverTest`
+      stack_name = `${fileName} roverTest`
     } else {
       stack_name = stack_name["stack_name"]
     }
     const region = deploymentregion["Deployment region"]
 
     exec(
-      `sh ${roverHelpers.npmroot}/@rover-tools/cli/scripts/exec.sh ${file_name} ${stack_name} ${region} ${bucketName} ${profile} `
+      `sh ${roverHelpers.npmroot}/@rover-tools/cli/scripts/exec.sh ${fileName} ${stack_name} ${region} ${bucketName} ${profile} `
     )
 
     const configdata: IroverDeploymentConfig = <IroverDeploymentConfig>{}

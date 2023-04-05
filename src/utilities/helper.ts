@@ -13,18 +13,18 @@ import * as cliConfig from "../configs/cliConfig"
 const exec = child.execSync
 const roverHelpers = rover.helpers
 import * as util from "./cliUtil"
-let moreStack
+let moreStacks
 export async function roverADD() {
-  const app_name = await util.inputString("app_name", "", false, "App Name:")
-  await roverHelpers.samValidate(<string>app_name["app_name"])
-  await roverHelpers.checkFile(<string>app_name["app_name"], "yes")
+  const appName = await util.inputString("appName", "", false, "App Name:")
+  await roverHelpers.samValidate(appName["appName"])
+  await roverHelpers.checkFile(appName["appName"], "yes")
   const language = await util.languageChoice()
-  const file_name = await exec(`ls ${app_name["app_name"]}/*.yaml `).toString()
-  const CompStacks = await roverHelpers.checkNested(file_name)
+  const fileName = await exec(`ls ${appName["appName"]}/*.yaml `).toString()
+  const CompStacks = await roverHelpers.checkNested(fileName)
   return {
-    appname: app_name,
+    appName: appName,
     language: language,
-    filename: file_name,
+    filename: fileName,
     compstack: CompStacks,
   }
 }
@@ -43,8 +43,8 @@ async function CRUDObject(stackName: string, AppType: string) {
 
     obj[stackName] = crud
     tempObj = { ...tempObj, crud }
-    moreStack = await util.moreStack("Do you want to add another API ?")
-  } while (moreStack !== "No")
+    moreStacks = await util.choicesYorN("Do you want to add another API ?")
+  } while (moreStacks !== "No")
   StackParams = { ...obj }
   return StackParams
 }
@@ -63,14 +63,14 @@ async function CustomObject(i: number) {
   return customStacks
 }
 export async function createModules(
-  app_name: Record<string, string>,
+  appName: Record<string, string>,
   language: string
 ) {
   const stack_names: Record<string, string> = {}
   let customStacks: Record<string, Array<string>> = {}
   const basecrud = {}
   let StackParams: TroverCLIStackParams = {}
-  let moreStack: string
+  let moreStacks: string
   const stackDetails: IstackDetails = {}
   const stackname: Record<string, string> = {}
   let i = 1
@@ -94,9 +94,11 @@ export async function createModules(
     } else {
       customStacks = { ...customStacks, ...(await CustomObject(i)) }
     }
-    moreStack = await util.moreStack("Do you want to add one more modules ? ")
+    moreStacks = await util.choicesYorN(
+      "Do you want to add one more modules ? "
+    )
     i++
-  } while (moreStack !== "No")
+  } while (moreStacks !== "No")
   if (stack_names !== null) {
     Object.keys(stack_names).forEach((element) => {
       stackDetails[element] = <IstackDetailsObject>{}
@@ -114,7 +116,7 @@ export async function createModules(
     })
   }
   const template: IroverInput = {
-    app_name: app_name["app_name"],
+    appName: appName["appName"],
     language,
     stackDetails: stackDetails,
   }
