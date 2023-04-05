@@ -339,65 +339,6 @@ export const choicesYorN = async function (message: string) {
   ])
   return r["stack"]
 }
-
-export const paramss = async function (module: string) {
-  const choice: Record<string, Array<string> | Array<Iroverdescription>> =
-    cliConfig.app.choices
-  let name: Record<string, string> = {}
-  let res: IroverCLIparamModule = <IroverCLIparamModule>{}
-  if (module === "CRUDModule") {
-    const modulesParams = moduleParams.CRUDModule["params"].params
-    const paramslength = modulesParams.length
-
-    if (paramslength > 0) {
-      for (let i = 0; i < paramslength; i++) {
-        if (modulesParams[i].value === "choice") {
-          const r = await inputType(
-            modulesParams[i].key,
-            <Array<string>>choice[modulesParams[i].key],
-            modulesParams[i].message
-          )
-
-          res = { ...res, ...r }
-        } else if (modulesParams[i].value === "multichoice") {
-          const r = await multichoice(
-            modulesParams[i].key,
-            <Array<string>>choice.methods,
-            ""
-          )
-          res = { ...res, ...r }
-        } else {
-          if (modulesParams[i].key === "name") {
-            const r = await inputString(
-              "name",
-              "",
-              false,
-              modulesParams[i].message
-            )
-            name = r
-          } else {
-            const r = await inputString(
-              modulesParams[i].key,
-              "",
-              false,
-              modulesParams[i].message
-            )
-            res = { ...res, ...r }
-          }
-        }
-      }
-      return {
-        res,
-        name: name["name"],
-      }
-    } else {
-      return {}
-    }
-  } else {
-    return {}
-  }
-}
-
 export const params = async function (module: string) {
   const { choices } = cliConfig.app
   const name: Record<string, string> = {}
