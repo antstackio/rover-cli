@@ -2,11 +2,7 @@ import * as inquirer from "inquirer"
 import * as cliConfig from "../configs/cliConfig"
 import * as buildConfig from "../configs/buildConfig"
 import * as rover from "@rover-tools/engine/dist/bin/index"
-import {
-  IroverDeploymentObject,
-  Iroverdescription,
-  IroverCLIparamModule,
-} from "../rover.types"
+import { IroverDeploymentObject, IroverCLIparamModule } from "../rover.types"
 
 const moduleParams = rover.modules.Modules
 const envpattern = new RegExp(/^env\d\d+$/g)
@@ -339,6 +335,7 @@ export const choicesYorN = async function (message: string) {
   ])
   return r["stack"]
 }
+
 export const params = async function (module: string) {
   const { choices } = cliConfig.app
   const name: Record<string, string> = {}
