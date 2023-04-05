@@ -56,64 +56,38 @@ export const jsonCreation = async function (
   }
 }
 
-export const inputStrings = async function (
-  userName: string,
-  defaults: string,
-  optional: boolean,
-  messages = ""
-) {
-  const takeInput = await inquirer.prompt([
-    {
-      type: "input",
-      name: userName,
-      message: messages,
-      validate: function (value) {
-        let message = ""
-        if (userName == "path") {
-          if (apipathpattern.test(value)) return true
-          else message = "Please enter a valid path"
-        } else if (envpattern.test(userName)) {
-          if (value !== "" && value !== undefined) return true
-          else message = "environment values cannot be empty"
-        } else {
-          if (!optional) {
-            if (stringpattern.test(value)) return true
-            else message = `${messages} should have only alphanumeric values`
-          }
-        }
-        if (message !== "") return message
-        else return true
-      },
-    },
-  ])
-  return { ...takeInput }
-}
-
 export async function inputString(
   name: string,
   defaults: string,
   optional: boolean,
   message = ""
 ) {
-  const takeInput = await inquirer.prompt([{
-    type: "input",
-    name,
-    message,
-    validate: (value) => {
-      if (name === "path") {
-        return apipathpattern.test(value) || "Please enter a valid path";
-      } else if (envpattern.test(name)) {
-        return (value !== "" && value !== undefined) || "Environment values cannot be empty";
-      } else {
-        return optional || stringpattern.test(value) || `${message} should have only alphanumeric values`;
-      }
+  const takeInput = await inquirer.prompt([
+    {
+      type: "input",
+      name,
+      message,
+      validate: (value) => {
+        if (name === "path") {
+          return apipathpattern.test(value) || "Please enter a valid path"
+        } else if (envpattern.test(name)) {
+          return (
+            (value !== "" && value !== undefined) ||
+            "Environment values cannot be empty"
+          )
+        } else {
+          return (
+            optional ||
+            stringpattern.test(value) ||
+            `${message} should have only alphanumeric values`
+          )
+        }
+      },
     },
-  }
-  ]);
+  ])
 
-  return { ...takeInput };
+  return { ...takeInput }
 }
-
 
 export const languageChoice = async function () {
   const lang = await inquirer.prompt([
@@ -424,7 +398,7 @@ export const paramss = async function (module: string) {
   }
 }
 
-export const params=async function(module: string) {
+export const params = async function (module: string) {
   const { choices } = cliConfig.app
   const name: Record<string, string> = {}
   const res: IroverCLIparamModule = <IroverCLIparamModule>{}

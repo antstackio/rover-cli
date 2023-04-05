@@ -1,6 +1,6 @@
 import { Iroverdescription } from "../rover.types"
 import * as rover from "@rover-tools/engine/dist/bin/index"
-const rovercomponents = rover.components
+const roverComponents = rover.components
 const Stack = rover.modules
 export const globalError =
   "Note: install @rover-tools/cli globally (install @rover-tools/cli -g)"
@@ -47,7 +47,7 @@ export const app: Record<
   },
 }
 export const customizable = {
-  components: Object.keys(rovercomponents.Components),
+  components: Object.keys(roverComponents.Components),
   modules: {
     keys: keys,
     values: values,

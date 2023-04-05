@@ -11,16 +11,16 @@ import {
 import * as child from "child_process"
 import * as cliConfig from "../configs/cliConfig"
 const exec = child.execSync
-const rover_helpers = rover.helpers
+const roverHelpers = rover.helpers
 import * as util from "./cliUtil"
 let moreStack
 export async function roverADD() {
   const app_name = await util.inputString("app_name", "", false, "App Name:")
-  await rover_helpers.samValidate(<string>app_name["app_name"])
-  await rover_helpers.checkFile(<string>app_name["app_name"], "yes")
+  await roverHelpers.samValidate(<string>app_name["app_name"])
+  await roverHelpers.checkFile(<string>app_name["app_name"], "yes")
   const language = await util.languageChoice()
   const file_name = await exec(`ls ${app_name["app_name"]}/*.yaml `).toString()
-  const CompStacks = await rover_helpers.checkNested(file_name)
+  const CompStacks = await roverHelpers.checkNested(file_name)
   return {
     appname: app_name,
     language: language,
@@ -58,7 +58,8 @@ async function CustomObject(i: number) {
     `Stack ${i} Name: `
   )
   const CustomStacks = await util.multichoice("app_type", choice, "")
-  customStacks[<string>customstack_name[`customStackName${i}`]] = CustomStacks.app_type
+  customStacks[<string>customstack_name[`customStackName${i}`]] =
+    CustomStacks.app_type
   return customStacks
 }
 export async function createModules(
@@ -77,7 +78,7 @@ export async function createModules(
   do {
     const AppType: string = <string>await util.appType("Module Type :")
     if (AppType !== "CustomizableModule") {
-      stackname[`stackName${i}`] = `${AppType}${rover_helpers.makeId(5)}`
+      stackname[`stackName${i}`] = `${AppType}${roverHelpers.makeId(5)}`
       const stack_name = stackname
       const stackName: string = stack_name[`stackName${i}`]
       if (AppType === "CRUDModule") {

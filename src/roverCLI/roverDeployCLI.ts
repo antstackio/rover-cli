@@ -1,5 +1,5 @@
 import * as rover from "@rover-tools/engine/dist/bin/index"
-const rover_helpers = rover.helpers
+const roverHelpers = rover.helpers
 import * as util from "../utilities/cliUtil"
 const deployment = rover.deployment
 import * as fs from "fs"
@@ -14,8 +14,8 @@ export async function deployCLI() {
   if (r === "repository and pipeline") {
     console.log("Work in progress...")
   } else if (r === "generate pipeline") {
-    await rover_helpers.samValidate("")
-    const lang: string = await rover_helpers.langValue()
+    await roverHelpers.samValidate("")
+    const lang: string = await roverHelpers.langValue()
     const pipeline = await util.samBuild(lang)
     const template = { repoConfig: pipeline }
     const repoconfig = await Promise.resolve(
@@ -23,14 +23,14 @@ export async function deployCLI() {
     )
     if (repoconfig !== undefined) {
       await deployment.setupRepo(JSON.parse(repoconfig)["repoConfig"])
-      rover_helpers.generateRoverConfig(
+      roverHelpers.generateRoverConfig(
         "",
         JSON.parse(repoconfig)["repoConfig"],
         "rover_generate_pipeline"
       )
     }
   } else {
-    await rover_helpers.samValidate("")
+    await roverHelpers.samValidate("")
     if (fs.existsSync("samconfig.toml")) {
       exec("rm -rf samconfig.toml")
     }
@@ -70,7 +70,7 @@ export async function deployCLI() {
     const region = deploymentregion["Deployment region"]
 
     exec(
-      `sh ${rover_helpers.npmroot}/@rover-tools/cli/scripts/exec.sh ${file_name} ${stack_name} ${region} ${bucketName} ${profile} `
+      `sh ${roverHelpers.npmroot}/@rover-tools/cli/scripts/exec.sh ${file_name} ${stack_name} ${region} ${bucketName} ${profile} `
     )
 
     const configdata: IroverDeploymentConfig = <IroverDeploymentConfig>{}
@@ -78,6 +78,6 @@ export async function deployCLI() {
     configdata["stack_name"] = stack_name
     configdata["region"] = region
     configdata["profile"] = profile
-    rover_helpers.generateRoverConfig("", configdata, "rover_deploy_cli")
+    roverHelpers.generateRoverConfig("", configdata, "rover_deploy_cli")
   }
 }

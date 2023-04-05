@@ -1,5 +1,5 @@
 import * as rover from "@rover-tools/engine/dist/bin/index"
-const rover_helpers = rover.helpers
+const roverHelpers = rover.helpers
 import {
   createSAMCLI,
   addComponentCLI,
@@ -14,7 +14,7 @@ import { version } from "../package.json"
 
 async function run(argv: Array<string>): Promise<void> {
   try {
-    if (!rover_helpers.npmrootTest()) {
+    if (!roverHelpers.npmrootTest()) {
       throw new Error(cliConfig.globalError)
     }
     const commandErrors = cliConfig.commandError(argv)

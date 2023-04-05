@@ -1,5 +1,5 @@
 import * as rover from "@rover-tools/engine/dist/bin/index"
-const rover_helpers = rover.helpers
+const roverHelpers = rover.helpers
 const rover_addComponent = rover.addComponents
 const rover_addModules = rover.addModules
 const rover_generateSAM = rover.generateSAM
@@ -25,7 +25,7 @@ export async function createSAMCLI(): Promise<void> {
     false,
     "App Name:"
   )
-  await rover_helpers.checkFile(app_name["app_name"], "no")
+  await roverHelpers.checkFile(app_name["app_name"], "no")
   const language = await util.languageChoice()
 
   const template: IroverInput = await createModules(app_name, language)
@@ -34,10 +34,10 @@ export async function createSAMCLI(): Promise<void> {
 export async function addComponentCLI() {
   const app_name = await util.inputString("app_name", "", false, "App Name")
   let template: IroveraddComponentInput
-  await rover_helpers.checkFile(app_name["app_name"], "yes")
+  await roverHelpers.checkFile(app_name["app_name"], "yes")
   const language = await util.languageChoice()
   const file_name = await exec(`ls ${app_name["app_name"]}/*.yaml `).toString()
-  const CompStacks = await rover_helpers.checkNested(file_name)
+  const CompStacks = await roverHelpers.checkNested(file_name)
   const nestedComponents: TnestedComponentsObject = <TnestedComponentsObject>{}
   const choice = Object.keys(CompStacks["compStacks"])
   let i = 0
@@ -102,7 +102,7 @@ export async function addModuleCLI(): Promise<void> {
     "Do you want to Add a module to existing Module :"
   )
   if (addToExisting.addToExisting[0] == "Yes") {
-    const CompStacks = await rover_helpers.checkNested(file_name)
+    const CompStacks = await roverHelpers.checkNested(file_name)
     const choice = Object.keys(CompStacks["compStacks"])
     let i = 0
     do {
@@ -115,7 +115,7 @@ export async function addModuleCLI(): Promise<void> {
         const selectedChoice = choice.filter((ele) =>
           Object.values(chooseStack).includes(ele)
         )
-        // const samResources = rover_helpers.listSAMResources(
+        // const samResources = roverHelpers.listSAMResources(
         //   file_name,
         //   selectedChoice[0]
         // )
