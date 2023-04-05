@@ -204,7 +204,7 @@ async function addModuleToStack(
   template: IroveraddModule
 ) {
   const chooseStack = await util.inputType(
-    "Select the stack to which you want to add the module ",
+    "Select the stack to which you want to add the module:",
     choice
   )
   const selectedChoice = choice.filter((ele) =>
