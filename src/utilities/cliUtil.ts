@@ -95,7 +95,7 @@ export async function inputString(
   optional: boolean,
   message = ""
 ) {
-  const takeInput = await inquirer.prompt({
+  const takeInput = await inquirer.prompt([{
     type: "input",
     name,
     message,
@@ -108,7 +108,8 @@ export async function inputString(
         return optional || stringpattern.test(value) || `${message} should have only alphanumeric values`;
       }
     },
-  });
+  }
+  ]);
 
   return { ...takeInput };
 }
