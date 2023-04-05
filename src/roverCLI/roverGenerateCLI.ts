@@ -154,6 +154,7 @@ export async function addModuleCLI(): Promise<void> {
     await rover_addModulesToexisting.addModulesToExistingStack(template)
   } else {
     template = <IroveraddModule>await createModules(app_name, language)
+    template["file_name"] = file_name
     await rover_addModules.addModules(template)
   }
 }
