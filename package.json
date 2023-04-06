@@ -1,17 +1,27 @@
 {
   "devDependencies": {
     "@types/node": "^12.12.7",
-    "typescript": "^4.7.4"
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "eslint": "^8.28.0",
+    "eslint-config-standard-with-typescript": "^23.0.0",
+    "eslint-plugin-eslint-plugin": "^5.0.6",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.5.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "typescript": "^4.9.3"
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
-    "@rover-tools/engine": "^0.0.49",
+    "@rover-tools/engine": "file:../rover-engine",
     "@types/inquirer": "^8.2.1",
+    "dotenv": "^16.0.3",
+    "eslint-config-prettier": "^8.5.0",
     "esm": "^3.2.25",
-    "immer": "^9.0.14",
     "inquirer": "^8.2.4",
     "js-yaml": "^4.1.0",
     "path": "^0.12.7",
+    "prettier": "^2.8.0",
     "shx": "^0.3.4",
     "yaml": "^1.10.2"
   },
@@ -23,10 +33,14 @@
   "scripts": {
     "clean": "shx rm -rf dist/*",
     "start": "tsc   bin/init.ts && tsc  bin/index.ts && npm install -g . ",
-    "build": "tsc",
+    "build": "tsc && npm run format:write && npm run lint:fix",
     "watch": "tsc --watch",
-    "localtest": "npm install /Users/dheerajbhatt/proj/rover-engine && npm run build && npm install /Users/dheerajbhatt/proj/rover-cli -g  ",
-    "prepack": "npm run clean && npm run build "
+    "localtest": "npm install $(grep rover_engine .env | cut -d '=' -f2 | tr -d '\"' ) && npm run build && npm install $(grep rover_cli .env | cut -d '=' -f2 | tr -d '\"') -g  ",
+    "prepack": "npm run clean && npm run build ",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write src/* bin/*",
+    "lint:check": "eslint . ",
+    "lint:fix": "eslint --fix ."
   },
   "bin": {
     "rover": "dist/bin/init.js"
@@ -48,5 +62,6 @@
   "homepage": "https://github.com/antstackio/rover-cli#readme",
   "workspaces": [
     "../rovertest/test"
-  ]
+  ],
+  "types": "./dist/bin/init.d.ts"
 }

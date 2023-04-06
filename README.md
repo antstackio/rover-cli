@@ -1,21 +1,21 @@
 # ![Create a sample project](./assets/roverForBright.png)Overview
 
-Rover is CLI tool  that generates/updates  SAM projects based on predefined modules and components. It helps in deployment by generating CI/CD pipeline or deploy through CLI in few clicks.
+Rover is CLI tool that generates/updates SAM projects based on predefined modules and components. It helps in deployment by generating CI/CD pipeline or deploy through CLI in few clicks.
 
-Modules are the small functional unit of the project like Email Authentication. Components are combination of  AWS services like Lambda with S3 as Trigger.
+Modules are the small functional unit of the project like Email Authentication. Components are combination of AWS services like Lambda with S3 as Trigger.
 
 It is a CLI-based library that supports Node and Python with a some AWS Services.
 
 #### To Install:
 
- npm install @rover-tools/cli -g
+npm install @rover-tools/cli -g
 
- **Note**: install the package globally
+**Note**: install the package globally
 
 ## Prerequisites
 
-* Python 3
-* AWS SAM CLI
+- Python 3
+- AWS SAM CLI
 
 In Rover, we have predefined modules, we can select them and create our project or we have options to create custom modules by selecting the components in that module.
 
@@ -33,11 +33,11 @@ $ rover init
 #### Deploy
 
 ```sh
-$ rover deploy         
+$ rover deploy
   1) generate pipeline
   2) cli
   3) repository and pipeline
-  
+
 ```
 
 **Note**: update and deploy should be done within the SAM project
@@ -56,4 +56,4 @@ $ rover deploy
 
 Rover, Lambda, S3, CLI , CI/CD Pipeline, SAM Projects
 
-**
+\*\*
