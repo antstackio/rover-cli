@@ -118,7 +118,7 @@ export const inputType = async function (
   return takeInput
 }
 
-export const confirmation = async function () {
+export const confirmation = async function ():Promise<string> {
   const r = await inquirer.prompt([
     {
       type: "rawlist",

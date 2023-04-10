@@ -11,15 +11,14 @@ import { version } from "../package.json"
 import * as util from "../src/utilities/cliUtil"
 
 function handleInitCommand(): Promise<void> {
-  // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve) => {
-    const editedSam = await util.confirmation()
-    if (editedSam === "create new SAM project") {
-      await createSAMCLI()
+  return new Promise( (resolve) => {
+    const editedSam = <string>(<unknown>util.confirmation())
+    if ( editedSam === "create new SAM project") {
+       createSAMCLI()
     } else if (editedSam === "add components to existing SAM") {
-      await addComponentCLI()
+       addComponentCLI()
     } else if (editedSam === "add modules to existing SAM") {
-      await addModuleCLI()
+       addModuleCLI()
     }
     resolve()
   })
