@@ -101,14 +101,14 @@ export const languageChoice = async function () {
 }
 
 export const inputType = async function (
-  userName: string,
+  name: string,
   choices: Array<string> | string,
   message = ""
 ) {
   const takeInput = await inquirer.prompt([
     {
       type: "rawlist",
-      name: `${userName}`,
+      name: `${name}`,
       message: message,
       choices:
         typeof choices === "string" ? cliConfig.app.choices[choices] : choices,
@@ -135,8 +135,8 @@ export const confirmation = async function ():Promise<string> {
   return r.choice
 }
 
-export const inputNumber = async function (userName: string, message: string) {
-  let displayname = userName
+export const inputNumber = async function (name: string, message: string) {
+  let displayname = name
   if (message !== undefined) {
     displayname = message
   }
@@ -144,7 +144,7 @@ export const inputNumber = async function (userName: string, message: string) {
     {
       type: "input",
       message: `Please enter the required number of ${displayname} you want ?`,
-      name: `${userName}`,
+      name: `${name}`,
       validate: function (value) {
         const pass = !isNaN(value) && value > 0
         if (pass) {
@@ -155,7 +155,7 @@ export const inputNumber = async function (userName: string, message: string) {
     },
   ])
 
-  return parseInt(takeInput[`${userName}`], 10)
+  return parseInt(takeInput[`${name}`], 10)
 }
 
 export const inputCli = async function (
@@ -184,12 +184,12 @@ export const inputCli = async function (
   }
   return res
 }
-export const password = async function (userName: string, message = "") {
+export const password = async function (name: string, message = "") {
   const r = await inquirer.prompt([
     {
       type: "password",
       message: message,
-      name: userName,
+      name: name,
     },
   ])
   return r
