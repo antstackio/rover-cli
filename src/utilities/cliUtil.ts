@@ -195,7 +195,7 @@ export const password = async function (userName: string, message = "") {
   return r
 }
 
-export const samBuild = async function (lang: string) {
+export const samBuilds = async function (lang: string) {
   try {
     const obj = buildConfig.samConfig
     const choices = <Record<string, Array<string>>>buildConfig.samConfig.choices
@@ -303,6 +303,121 @@ export const samBuild = async function (lang: string) {
       ...deploymentEvent,
     }
     return result
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const samBuild = async (lang: string) => {
+  try {
+    const { samConfig } = buildConfig
+
+    const sam = await inputCli(
+      samConfig,
+      <Array<Record<string, string>>>samConfig.samBuild,
+      ""
+    )
+
+    const { choices } = samConfig
+
+    const language = { language: lang }
+
+    const no_of_env = await inputNumber("no_of_env", "environments")
+    const envs = []
+    const steps = {}
+    const stacknames = {}
+    const deploymentregion = <Record<string, string>>{}
+    const deploymentparameters = {}
+    const depBucketNames = {}
+
+    const branches = { branches: ["main"] }
+
+    for (let i = 1; i <= no_of_env; i++) {
+      const envName = <string>(
+        (await inputString(`env${i}`, "", false, `Environment ${i}:`))[
+          `env${i}`
+        ]
+      )
+      envs.push(envName)
+
+      const stepsChoice = (<Record<string, Array<string>>>choices).dev
+      const stepData = await multichoice(
+        `Steps required for ${envName} environment`,
+        stepsChoice,
+        ""
+      )
+      const step = Object.fromEntries(
+        Object.entries(stepData).map(([key, value]) => {
+          const name = key
+            .replace("steps required for ", "")
+            .replace(" environment ", "")
+          return [name, value]
+        })
+      )
+      Object.assign(steps, step)
+
+      const stackname = (
+        await inputString(
+          `${envName}`,
+          "",
+          true,
+          `Stack Name (optional) --> ${envName}:`
+        )
+      )[envName]
+      const deploymentbucket = (
+        await inputString(
+          `${envName}`,
+          "",
+          true,
+          `Deployment Bucket (optional) --> ${envName}:`
+        )
+      )[envName]
+
+      const regionChoice = (<Record<string, Array<string>>>choices)
+        .deploymentregion
+      const deployment_region = <string>(
+        (await inputType(`${envName}`, regionChoice, "Deployment Region"))[
+          `${envName}`
+        ]
+      )
+      deploymentregion[`${envName}`] = deployment_region
+
+      const deployment_parameter = (
+        await inputString(
+          `${envName}`,
+          "",
+          true,
+          `Deployment Parameter (optional) --> ${envName}:`
+        )
+      )[envName]
+
+      Object.assign(stacknames, { [envName]: stackname })
+      Object.assign(depBucketNames, { [envName]: deploymentbucket })
+      Object.assign(deploymentparameters, { [envName]: deployment_parameter })
+    }
+
+    const deployment_choice = (<Record<string, Array<string>>>choices)
+      .deployment
+    const deploymentEvent = await multichoice(
+      `Deployment Events`,
+      deployment_choice,
+      ""
+    )
+
+    return {
+      ...sam,
+      ...language,
+      no_of_env,
+      envs,
+      ...branches,
+      framework: "sam",
+      steps,
+      stackname: { ...stacknames },
+      deploymentbucket: { ...depBucketNames },
+      deploymentregion,
+      deploymentparameters,
+      ...deploymentEvent,
+    }
   } catch (error) {
     console.log(error)
   }
