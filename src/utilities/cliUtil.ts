@@ -206,7 +206,7 @@ export const samBuilds = async function (lang: string) {
       ""
     )
     const temp: Record<string, Record<string, string>> = {}
-    Object.values(sam).map((ele) => {
+    Object.values(sam).forEach((ele) => {
       Object.assign(temp, ele)
     })
     sam = temp
