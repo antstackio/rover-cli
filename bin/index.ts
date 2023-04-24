@@ -4,35 +4,38 @@ import {
   createSAMCLI,
   addComponentCLI,
   addModuleCLI,
+  createCustomSAMCLI,
 } from "../src/roverCLI/roverGenerateCLI"
 import { deployCLI } from "../src/roverCLI/roverDeployCLI"
 import * as cliConfig from "../src/configs/cliConfig"
 import { version } from "../package.json"
 import * as util from "../src/utilities/cliUtil"
 
-function handleInitCommand(): Promise<void> {
-  return new Promise( (resolve) => {
-    const editedSam = <string>(<unknown>util.confirmation())
-    if ( editedSam === "create new SAM project") {
-       createSAMCLI()
-    } else if (editedSam === "add components to existing SAM") {
-       addComponentCLI()
-    } else if (editedSam === "add modules to existing SAM") {
-       addModuleCLI()
-    }
-    resolve()
-  })
+async function handleInitCommand() {
+  const editedSam = await (<string>(<unknown>util.confirmation()))
+  if (editedSam === "create predefined SAM project") {
+    await createSAMCLI()
+  } else if (editedSam === "create custom SAM project") {
+    await createCustomSAMCLI()
+  } else if (editedSam === "add components to existing SAM") {
+    await addComponentCLI()
+  } else if (editedSam === "add modules to existing SAM") {
+    await addModuleCLI()
+  } else {
+    console.log(editedSam)
+    throw new Error(`Unknown option ${editedSam}`)
+  }
 }
 
 async function handleDeployCommand(): Promise<void> {
   await deployCLI()
 }
 
-function handleVersionCommand(): void {
+async function handleVersionCommand(): Promise<void> {
   console.log(version)
 }
 
-function handleUnknownCommand(): void {
+async function handleUnknownCommand(): Promise<void> {
   console.log(cliConfig.commandError(process.argv.slice(2)))
 }
 
@@ -57,8 +60,7 @@ async function run(argv: Array<string>): Promise<void> {
         handleUnknownCommand()
     }
   } catch (error) {
-    console.log("Error: ", error as Error)
-    //.message)
+    console.log("Error: ", (error as Error).message)
   }
 }
 

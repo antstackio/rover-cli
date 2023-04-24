@@ -84,6 +84,22 @@ export async function inputString(
 
   return { ...takeInput }
 }
+export async function inputDescription(
+  name: string,
+  defaults: string,
+  optional: boolean,
+  message = ""
+) {
+  const takeInput = await inquirer.prompt([
+    {
+      type: "input",
+      name,
+      message,
+    },
+  ])
+
+  return { ...takeInput }
+}
 
 export const languageChoice = async function () {
   const lang = await inquirer.prompt([
@@ -118,14 +134,15 @@ export const inputType = async function (
   return takeInput
 }
 
-export const confirmation = async function ():Promise<string> {
+export const confirmation = async function (): Promise<string> {
   const r = await inquirer.prompt([
     {
       type: "rawlist",
       name: "choice",
       message: `Hey, what do you want ?`,
       choices: [
-        "create new SAM project",
+        "create predefined SAM project",
+        "create custom SAM project",
         "add components to existing SAM",
         "add modules to existing SAM",
       ],
