@@ -84,6 +84,22 @@ export async function inputString(
 
   return { ...takeInput }
 }
+export async function inputDescription(
+  name: string,
+  defaults: string,
+  optional: boolean,
+  message = ""
+) {
+  const takeInput = await inquirer.prompt([
+    {
+      type: "input",
+      name,
+      message,
+    },
+  ])
+
+  return { ...takeInput }
+}
 
 export const languageChoice = async function () {
   const lang = await inquirer.prompt([
@@ -101,14 +117,14 @@ export const languageChoice = async function () {
 }
 
 export const inputType = async function (
-  userName: string,
+  name: string,
   choices: Array<string> | string,
   message = ""
 ) {
   const takeInput = await inquirer.prompt([
     {
       type: "rawlist",
-      name: `${userName}`,
+      name: `${name}`,
       message: message,
       choices:
         typeof choices === "string" ? cliConfig.app.choices[choices] : choices,
@@ -118,7 +134,7 @@ export const inputType = async function (
   return takeInput
 }
 
-export const confirmation = async function ():Promise<string> {
+export const confirmation = async function () {
   const r = await inquirer.prompt([
     {
       type: "rawlist",
@@ -126,6 +142,7 @@ export const confirmation = async function ():Promise<string> {
       message: `Hey, what do you want ?`,
       choices: [
         "create new SAM project",
+        "create custom SAM project",
         "add components to existing SAM",
         "add modules to existing SAM",
       ],
@@ -135,8 +152,8 @@ export const confirmation = async function ():Promise<string> {
   return r.choice
 }
 
-export const inputNumber = async function (userName: string, message: string) {
-  let displayname = userName
+export const inputNumber = async function (name: string, message: string) {
+  let displayname = name
   if (message !== undefined) {
     displayname = message
   }
@@ -144,7 +161,7 @@ export const inputNumber = async function (userName: string, message: string) {
     {
       type: "input",
       message: `Please enter the required number of ${displayname} you want ?`,
-      name: `${userName}`,
+      name: `${name}`,
       validate: function (value) {
         const pass = !isNaN(value) && value > 0
         if (pass) {
@@ -155,7 +172,7 @@ export const inputNumber = async function (userName: string, message: string) {
     },
   ])
 
-  return parseInt(takeInput[`${userName}`], 10)
+  return parseInt(takeInput[`${name}`], 10)
 }
 
 export const inputCli = async function (
@@ -184,128 +201,15 @@ export const inputCli = async function (
   }
   return res
 }
-export const password = async function (userName: string, message = "") {
+export const password = async function (name: string, message = "") {
   const r = await inquirer.prompt([
     {
       type: "password",
       message: message,
-      name: userName,
+      name: name,
     },
   ])
   return r
-}
-
-export const samBuilds = async function (lang: string) {
-  try {
-    const obj = buildConfig.samConfig
-    const choices = <Record<string, Array<string>>>buildConfig.samConfig.choices
-    const subObj = <Array<Record<string, string>>>buildConfig.samConfig.samBuild
-    let sam: Record<string, Record<string, string>> = await inputCli(
-      obj,
-      subObj,
-      ""
-    )
-    const temp: Record<string, Record<string, string>> = {}
-    Object.values(sam).forEach((ele) => {
-      Object.assign(temp, ele)
-    })
-    sam = temp
-    const langs = { language: lang }
-    const no_of_env = await inputNumber("no_of_env", "environments")
-    const envs: string[] = []
-    let steps: Record<string, Array<string>> = {}
-    let stacknames: Record<string, string> = {}
-    const deploymentregion: Record<string, string> = {}
-    let deploymentparameters: Record<string, string> = {}
-    let depBucketNames: Record<string, string> = {}
-
-    const branches = { branches: ["main"] }
-    for (let i = 1; i <= no_of_env; i++) {
-      const env = await inputString(`env${i}`, "", false, `Envrionment ${i} :`)
-      const envName = env[`env${i}`]
-      envs.push(envName)
-
-      const stepsChoice = choices.dev
-      let step = await multichoice(
-        `steps required for ${envName} environment `,
-        stepsChoice,
-        ""
-      )
-      const steps1: Record<string, Array<string>> = {}
-      step = Object.keys(step).map((ele) => {
-        let name: string = ele.replace("steps required for ", "")
-        name = name.replace(" environment ", "")
-        steps1[name] = step[ele]
-      })
-
-      const stackname = await inputString(
-        `${envName}`,
-        "",
-        true,
-
-        `Stack Name(optional) --> ${envName} :`
-      )
-      const deploymentbucket = await inputString(
-        `${envName}`,
-        "",
-        true,
-        `Deployment Bucket(optional) --> ${envName} :`
-      )
-      const regionChoice = choices.deploymentregion
-      const deployment_region = await inputType(
-        `${envName}`,
-        regionChoice,
-        "Deployment Region"
-      )
-      const deployment_parameter = await inputString(
-        `${envName}`,
-        "",
-        true,
-        `Deployment Parameter(optional) --> ${envName} :`
-      )
-      steps = { ...steps, ...steps1 }
-
-      stacknames = { ...stacknames, ...stackname }
-
-      depBucketNames = {
-        ...depBucketNames,
-        ...deploymentbucket,
-      }
-      deploymentregion[`${envName}`] = deployment_region[`${envName}`]
-      deploymentparameters = {
-        ...deploymentparameters,
-        ...deployment_parameter,
-      }
-    }
-
-    const deployment_choice = choices.deployment
-    const deploymentEvent = await multichoice(
-      `deploymentevents`,
-      deployment_choice,
-      ""
-    )
-    const framework = { framework: "sam" }
-
-    const result: IroverDeploymentObject = {
-      ...sam,
-      ...langs,
-      no_of_env,
-      envs,
-      ...branches,
-      ...framework,
-      steps,
-      stackname: { ...stacknames },
-      deploymentbucket: {
-        ...depBucketNames,
-      },
-      deploymentregion,
-      deploymentparameters,
-      ...deploymentEvent,
-    }
-    return result
-  } catch (error) {
-    console.log(error)
-  }
 }
 
 export const samBuild = async (lang: string) => {

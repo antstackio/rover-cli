@@ -4,6 +4,7 @@ const rover_addComponent = rover.addComponents
 const rover_addModules = rover.addModules
 const rover_generateSAM = rover.generateSAM
 const rover_addModulesToexisting = rover.addModulesToExisting
+const rover_generateCustomSAM = rover.generateCustomSAM
 import * as util from "../utilities/cliUtil"
 import * as cliConfig from "../configs/cliConfig"
 import { createModules, roverADD } from "../utilities/helper"
@@ -156,4 +157,23 @@ async function addModuleToStack(
     }
   }
   return template
+}
+export async function createCustomSAMCLI() {
+  const appName: Record<string, string> = await util.inputString(
+    "appName",
+    "",
+    false,
+    "App Name:"
+  )
+  const Description: Record<string, string> = await util.inputDescription(
+    "description",
+    "",
+    false,
+    "You want a SAM project to ?"
+  )
+  await roverHelpers.checkFile(appName["appName"], "no")
+  await rover_generateCustomSAM.generateCustomSAM(
+    appName["appName"],
+    Description["description"]
+  )
 }
