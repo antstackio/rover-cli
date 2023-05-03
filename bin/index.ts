@@ -39,7 +39,7 @@ async function handleUnknownCommand(): Promise<void> {
   console.log(cliConfig.commandError(process.argv.slice(2)))
 }
 
-async function run(argv: Array<string>): Promise<void> {
+ function run(argv: Array<string>): void {
   try {
     if (!roverHelpers.npmrootTest()) {
       throw new Error(cliConfig.globalError)
@@ -54,10 +54,10 @@ async function run(argv: Array<string>): Promise<void> {
         break
       case "-v":
       case "--version":
-        handleVersionCommand()
+        await handleVersionCommand()
         break
       default:
-        handleUnknownCommand()
+        await handleUnknownCommand()
     }
   } catch (error) {
     console.log("Error: ", (error as Error).message)
