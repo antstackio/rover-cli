@@ -39,7 +39,7 @@ async function handleUnknownCommand(): Promise<void> {
   console.log(cliConfig.commandError(process.argv.slice(2)))
 }
 
- function run(argv: Array<string>): void {
+async function run(argv: Array<string>): Promise<void> {
   try {
     if (!roverHelpers.npmrootTest()) {
       throw new Error(cliConfig.globalError)
