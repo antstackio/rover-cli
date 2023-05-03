@@ -12,8 +12,8 @@ import { version } from "../package.json"
 import * as util from "../src/utilities/cliUtil"
 
 async function handleInitCommand() {
-  const editedSam =  (<string>(<unknown>await util.confirmation()))
-  if (editedSam === "create predefined SAM project") {
+  const editedSam = <string>(<unknown>await util.confirmation())
+  if (editedSam === "create new SAM project") {
     await createSAMCLI()
   } else if (editedSam === "create custom SAM project") {
     await createCustomSAMCLI()

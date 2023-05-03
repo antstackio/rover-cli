@@ -141,7 +141,7 @@ export const confirmation = async function () {
       name: "choice",
       message: `Hey, what do you want ?`,
       choices: [
-        "create predefined SAM project",
+        "create new SAM project",
         "create custom SAM project",
         "add components to existing SAM",
         "add modules to existing SAM",
