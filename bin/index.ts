@@ -12,12 +12,19 @@ import { version } from "../package.json"
 import * as util from "../src/utilities/cliUtil"
 
 async function handleInitCommand() {
-  const editedSam = <string>(<unknown>await util.confirmation())
+  const editedSam = <string>(<unknown>await util.initConfirmation())
   if (editedSam === "create new SAM project") {
     await createSAMCLI()
   } else if (editedSam === "create custom SAM project") {
     await createCustomSAMCLI()
-  } else if (editedSam === "add components to existing SAM") {
+  } else {
+    console.log(editedSam)
+    throw new Error(`Unknown option ${editedSam}`)
+  }
+}
+async function handleAddCommand() {
+  const editedSam = <string>(<unknown>await util.addConfirmation())
+  if (editedSam === "add components to existing SAM") {
     await addComponentCLI()
   } else if (editedSam === "add modules to existing SAM") {
     await addModuleCLI()
@@ -48,6 +55,9 @@ async function run(argv: Array<string>): Promise<void> {
     switch (argv[0]) {
       case "init":
         await handleInitCommand()
+        break
+      case "add":
+        await handleAddCommand()
         break
       case "deploy":
         await handleDeployCommand()

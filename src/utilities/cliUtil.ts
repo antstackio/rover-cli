@@ -71,13 +71,20 @@ export async function inputString(
             (value !== "" && value !== undefined) ||
             "Environment values cannot be empty"
           )
-        } else {
-          return (
-            optional ||
-            stringpattern.test(value) ||
-            `${message} should have only alphanumeric values`
-          )
         }
+        // return (
+        //   optional ||
+        //   stringpattern.test(value) ||
+        //   `${typeof message} ${typeof value} ${typeof optional} ${typeof stringpattern.test(
+        //     value
+        //   )} should have only alphanumeric values `
+        // )
+        return (
+          optional ||
+          (!stringpattern.test(value)
+            ? `should have only alphanumeric values`
+            : true)
+        )
       },
     },
   ])
@@ -134,15 +141,25 @@ export const inputType = async function (
   return takeInput
 }
 
-export const confirmation = async function () {
+export const initConfirmation = async function () {
+  const r = await inquirer.prompt([
+    {
+      type: "rawlist",
+      name: "choice",
+      message: `Hey, what do you want ?`,
+      choices: ["create new SAM project", "create custom SAM project"],
+    },
+  ])
+
+  return r.choice
+}
+export const addConfirmation = async function () {
   const r = await inquirer.prompt([
     {
       type: "rawlist",
       name: "choice",
       message: `Hey, what do you want ?`,
       choices: [
-        "create new SAM project",
-        "create custom SAM project",
         "add components to existing SAM",
         "add modules to existing SAM",
       ],

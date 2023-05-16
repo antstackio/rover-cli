@@ -1,6 +1,7 @@
 import * as rover from "@rover-tools/engine/dist/bin/index"
 const roverHelpers = rover.helpers
-const rover_addComponent = rover.addComponents
+//const rover_addComponent = rover.addComponents
+const rover_addComponent = rover.addComponent
 const rover_addModules = rover.addModules
 const rover_generateSAM = rover.generateSAM
 const rover_addModulesToexisting = rover.addModulesToExisting
