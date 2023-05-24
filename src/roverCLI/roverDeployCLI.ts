@@ -70,7 +70,7 @@ export async function deployCLI() {
     const region = deploymentregion["Deployment region"]
 
     exec(
-      `sh ${roverHelpers.npmroot}/@rover-tools/cli/scripts/exec.sh ${fileName} ${stack_name} ${region} ${bucketName} ${profile} `
+      `sh ${roverHelpers.npmroot}/@rover-tools/cli/scripts/exec.sh ${fileName} ${stack_name} ${profile} ${region}  ${bucketName}`
     )
 
     const configdata: IroverDeploymentConfig = <IroverDeploymentConfig>{}

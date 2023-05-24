@@ -4,7 +4,7 @@ export const samConfig: Record<
 > = {
   choices: {
     tool: ["GitHub", "GitLab", "BitBucket"],
-    language: ["js", "python"],
+    language: ["js"],
     framework: ["sam", "cdk"],
     deploymentregion: [
       "us-east-2",

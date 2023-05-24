@@ -41,7 +41,7 @@ export const app: Record<
   choices: {
     methods: ["put", "get", "post", "delete"],
     resourcetype: ["lambda", "stepfunction", "dynamodb"],
-    language: ["Node", "Python"],
+    language: ["Node"],
     type: Object.values(moduleDescription),
     pipeline: ["generate pipeline", "cli", "repository and pipeline"],
   },
