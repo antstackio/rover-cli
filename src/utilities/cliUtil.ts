@@ -71,20 +71,13 @@ export async function inputString(
             (value !== "" && value !== undefined) ||
             "Environment values cannot be empty"
           )
+        } else {
+          return (
+            optional ||
+            stringpattern.test(value) ||
+            `${message} ${name} ${value} should have only alphanumeric values `
+          )
         }
-        // return (
-        //   optional ||
-        //   stringpattern.test(value) ||
-        //   `${typeof message} ${typeof value} ${typeof optional} ${typeof stringpattern.test(
-        //     value
-        //   )} should have only alphanumeric values `
-        // )
-        return (
-          optional ||
-          (!stringpattern.test(value)
-            ? `should have only alphanumeric values`
-            : true)
-        )
       },
     },
   ])
