@@ -263,8 +263,8 @@ export const samBuild = async (lang: string) => {
       const step = Object.fromEntries(
         Object.entries(stepData).map(([key, value]) => {
           const name = key
-            .replace("steps required for ", "")
-            .replace(" environment ", "")
+            .replace("Steps required for ", "")
+            .replace(" environment", "")
           return [name, value]
         })
       )
@@ -313,7 +313,7 @@ export const samBuild = async (lang: string) => {
     const deployment_choice = (<Record<string, Array<string>>>choices)
       .deployment
     const deploymentEvent = await multichoice(
-      `Deployment Events`,
+      `deploymentevents`,
       deployment_choice,
       ""
     )
