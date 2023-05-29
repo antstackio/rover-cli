@@ -19,10 +19,20 @@ export async function deployCLI() {
     const pipeline = await util.samBuild(lang)
     const template = { repoConfig: pipeline }
     const repoconfig = await Promise.resolve(
-      util.jsonCreation(<Record<string, IroverDeploymentObject>>template)
+      util.jsonCreation(
+        <Record<string, IroverDeploymentObject>>(<unknown>template)
+      )
     )
     if (repoconfig !== undefined) {
-      await deployment.setupRepo(JSON.parse(repoconfig)["repoConfig"])
+      const Configs: IroverDeploymentObject =
+        JSON.parse(repoconfig)["repoConfig"]
+      Configs["repoType"] = (<Record<string, string>>(
+        (<unknown>Configs["repoType"])
+      ))["repoType"]
+      Configs["tool"] = (<Record<string, string>>(<unknown>Configs["tool"]))[
+        "tool"
+      ]
+      await deployment.setupRepo(Configs)
       roverHelpers.generateRoverConfig(
         "",
         JSON.parse(repoconfig)["repoConfig"],
@@ -63,7 +73,7 @@ export async function deployCLI() {
       bucketName = ` --s3-bucket ${bucketName["name"]}`
     }
     if (stack_name["stack_name"] == "") {
-      stack_name = `${fileName} roverTest`
+      stack_name = `${fileName}roverTest`
     } else {
       stack_name = stack_name["stack_name"]
     }
