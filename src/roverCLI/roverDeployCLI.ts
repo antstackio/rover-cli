@@ -73,7 +73,7 @@ export async function deployCLI() {
       bucketName = ` --s3-bucket ${bucketName["name"]}`
     }
     if (stack_name["stack_name"] == "") {
-      stack_name = `${fileName} roverTest`
+      stack_name = `${fileName}roverTest`
     } else {
       stack_name = stack_name["stack_name"]
     }
